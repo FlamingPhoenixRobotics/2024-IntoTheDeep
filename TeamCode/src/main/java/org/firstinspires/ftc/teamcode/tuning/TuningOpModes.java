@@ -23,6 +23,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpModeRegistrar;
 
 import org.firstinspires.ftc.robotcore.internal.opmode.OpModeMeta;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.MecanumDriveOTOS;
 import org.firstinspires.ftc.teamcode.TankDrive;
 import org.firstinspires.ftc.teamcode.ThreeDeadWheelLocalizer;
 import org.firstinspires.ftc.teamcode.TwoDeadWheelLocalizer;
@@ -104,7 +105,43 @@ public final class TuningOpModes {
                                 MecanumDrive.PARAMS.kA / MecanumDrive.PARAMS.inPerTick)
                 );
             };
-        } else if (DRIVE_CLASS.equals(TankDrive.class)) {
+        } else if (DRIVE_CLASS.equals(MecanumDriveOTOS.class)){
+            dvf = hardwareMap -> {
+                MecanumDriveOTOS mdo = new MecanumDriveOTOS(hardwareMap, new Pose2d(0, 0, 0));
+
+                List<Encoder> leftEncs = new ArrayList<>(), rightEncs = new ArrayList<>();
+                List<Encoder> parEncs=  new ArrayList<>(), perpEncs = new ArrayList<>();
+                MecanumDriveOTOS.OTOSLocalizer dl = (MecanumDriveOTOS.OTOSLocalizer) mdo.localizer;
+                parEncs.add(dl.par);
+                perpEncs.add(dl.perp);
+
+                return new DriveView(DriveType.MECANUM,
+                        MecanumDriveOTOS.PARAMS.inPerTick,
+                        MecanumDriveOTOS.PARAMS.maxWheelVel,
+                        MecanumDriveOTOS.PARAMS.minProfileAccel,
+                        MecanumDriveOTOS.PARAMS.maxProfileAccel,
+                        hardwareMap.getAll(LynxModule.class),
+                        Arrays.asList(
+                                mdo.leftFront,
+                                mdo.leftBack
+                        ),
+                        Arrays.asList(
+                                mdo.rightFront,
+                                mdo.rightBack
+                        ),
+                        leftEncs,
+                        rightEncs,
+                        parEncs,
+                        perpEncs,
+                        mdo.lazyImu,
+                        mdo.voltageSensor,
+                        () -> new MotorFeedforward(MecanumDrive.PARAMS.kS,
+                                MecanumDrive.PARAMS.kV / MecanumDrive.PARAMS.inPerTick,
+                                MecanumDrive.PARAMS.kA / MecanumDrive.PARAMS.inPerTick)
+                );
+            };
+        }
+        else if (DRIVE_CLASS.equals(TankDrive.class)) {
             dvf = hardwareMap -> {
                 TankDrive td = new TankDrive(hardwareMap, new Pose2d(0, 0, 0));
 

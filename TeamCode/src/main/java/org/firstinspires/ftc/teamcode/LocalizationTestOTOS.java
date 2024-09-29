@@ -30,15 +30,16 @@ public class LocalizationTestOTOS extends LinearOpMode {
                         ),
                         -gamepad1.right_stick_x
                 ));
+
+
+                drive.updatePoseEstimate();
                 if(gamepad1.a){
-                    drive.updatePoseEstimate();
                     Action goback = drive.actionBuilder(drive.pose)
                             .splineToConstantHeading(new Vector2d(0,0), Math.PI/2)
                             .build();
                     com.acmerobotics.roadrunner.ftc.Actions.runBlocking(goback);
                 }
 
-                drive.updatePoseEstimate();
 
                 telemetry.addData("x", drive.pose.position.x);
                 telemetry.addData("y", drive.pose.position.y);
