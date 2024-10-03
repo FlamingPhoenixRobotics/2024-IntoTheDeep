@@ -12,8 +12,8 @@ enum OTOS_DIRECTION{
     Y
 }
 public class OTOS_Encoder implements Encoder {
-    private SparkFunOTOS otos;
-    public OTOS_DIRECTION xOrY = OTOS_DIRECTION.X;
+    private final SparkFunOTOS otos;
+    public OTOS_DIRECTION xOrY;
     public OTOS_Encoder(SparkFunOTOS otos,OTOS_DIRECTION direction){
         this.otos = otos;
         xOrY = direction;

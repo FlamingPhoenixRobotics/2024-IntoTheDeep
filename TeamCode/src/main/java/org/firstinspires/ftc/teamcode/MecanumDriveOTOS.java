@@ -36,9 +36,7 @@ import com.acmerobotics.roadrunner.ftc.Encoder;
 import com.acmerobotics.roadrunner.ftc.FlightRecorder;
 import com.acmerobotics.roadrunner.ftc.LazyImu;
 import com.acmerobotics.roadrunner.ftc.LynxFirmware;
-import com.acmerobotics.roadrunner.ftc.OverflowEncoder;
 import com.acmerobotics.roadrunner.ftc.PositionVelocityPair;
-import com.acmerobotics.roadrunner.ftc.RawEncoder;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
@@ -51,10 +49,8 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.messages.DriveCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.MecanumCommandMessage;
-import org.firstinspires.ftc.teamcode.messages.MecanumLocalizerInputsMessage;
 import org.firstinspires.ftc.teamcode.messages.PoseMessage;
 
 import java.util.Arrays;
@@ -64,9 +60,9 @@ import java.util.List;
 @Config
 public final class MecanumDriveOTOS {
     public static class Params {
-//        // IMU orientation
-//        // TODO: fill in these values based on
-//        //   see https://ftc-docs.firstinspires.org/en/latest/programming_resources/imu/imu.html?highlight=imu#physical-hub-mounting
+        // IMU orientation
+        // TODO: fill in these values based on
+        //   see https://ftc-docs.firstinspires.org/en/latest/programming_resources/imu/imu.html?highlight=imu#physical-hub-mounting
         public RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection =
                 RevHubOrientationOnRobot.LogoFacingDirection.UP;
         public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
@@ -145,14 +141,16 @@ public final class MecanumDriveOTOS {
         public OTOSLocalizer(){
 
             imu = lazyImu.get();
+            //reset OTOS
             otos.setLinearUnit(DistanceUnit.INCH);
             otos.setAngularUnit(AngleUnit.RADIANS);
             otos.resetTracking();
             otos.setOffset(new SparkFunOTOS.Pose2D(0,0,0));
+            //calibrate OTOS
             otos.setAngularScalar(1.0);
             otos.setLinearScalar(1.0);
             otos.calibrateImu();
-
+            //OTOS virtual encoders
             par = new OTOS_Encoder(otos,OTOS_DIRECTION.Y);
             perp = new OTOS_Encoder(otos,OTOS_DIRECTION.X);
 
@@ -180,6 +178,7 @@ public final class MecanumDriveOTOS {
             int xDelta = (int)pose.x*10000 - lastX;
             int yDelta = (int)pose.y*10000 - lastY;
             double headingDelta = heading.minus(lastHeading);
+            // subtract headingDelta/vel because when the sensor is offset from the center, the rotation affects the x and y
             Twist2dDual<Time> twist = new Twist2dDual<>(
                     new Vector2dDual<>(
                             new DualNum<Time>(new double[] {

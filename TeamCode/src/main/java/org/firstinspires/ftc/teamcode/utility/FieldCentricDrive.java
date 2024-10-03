@@ -13,6 +13,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 public class FieldCentricDrive {
     DcMotor fl, fr, bl, br;
     IMU imu;
+    boolean useIMU = true;
+    double heading;
     /**
      * Initialize motors
      * @param hardwareMap hardwareMap from opmode
@@ -30,13 +32,41 @@ public class FieldCentricDrive {
         imu.initialize(parameters);
     }
     /**
+     * Initialize motors
+     * @param hardwareMap hardwareMap from opmode
+     * @param useIMU whether or not to use the IMU
+     */
+    public FieldCentricDrive(HardwareMap hardwareMap, boolean useIMU){
+        fl = hardwareMap.dcMotor.get("fl");
+        fr = hardwareMap.dcMotor.get("fr");
+        bl = hardwareMap.dcMotor.get("bl");
+        br = hardwareMap.dcMotor.get("br");
+        //reverse motors
+        fl.setDirection(DcMotor.Direction.REVERSE);
+        bl.setDirection(DcMotor.Direction.REVERSE);
+        this.useIMU = useIMU;
+        if(useIMU) {
+        imu = hardwareMap.get(IMU.class, "imu");
+        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP, RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD));
+        imu.initialize(parameters);}
+        else{
+            heading = 0;
+        }
+    }
+    /**
      * Drive based off of gamepad inputs
      * @param gpx gamepad x input
      * @param gpy gamepad y input
      * @param rx gamepad rotation input
      */
     public void drive(double gpx, double gpy, double rx) {
-        double botHeading = -imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);//might be degrees
+        double botHeading;
+        if(useIMU) {
+            botHeading= -imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);//might be degrees
+        }
+        else{
+            botHeading = heading;
+        }
         double rotX = gpx * Math.cos(botHeading) - gpy * Math.sin(botHeading);
         double rotY = gpx * Math.sin(botHeading) + gpy * Math.cos(botHeading);
 
@@ -61,7 +91,13 @@ public class FieldCentricDrive {
         double x = gamepad1.left_stick_x*1.1;
         double y = -gamepad1.left_stick_y;
         double rx = gamepad1.right_stick_x;
-        double botHeading = -imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);//might be degrees
+        double botHeading;
+        if(useIMU) {
+            botHeading= -imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);//might be degrees
+        }
+        else{
+            botHeading = heading;
+        }
         double rotX = x * Math.cos(botHeading) - y * Math.sin(botHeading);
         double rotY = x * Math.sin(botHeading) + y * Math.cos(botHeading);
 
@@ -92,7 +128,12 @@ public class FieldCentricDrive {
      * @return robot heading
      */
     public double getHeading(){
-        return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        if(useIMU) {
+            return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        }
+        else{
+            return heading;
+        }
     }
     /**
      * Get robot heading in a specified angle unit
@@ -100,15 +141,26 @@ public class FieldCentricDrive {
      * @return robot heading
      */
     public double getHeading(AngleUnit angleUnit){
-        return imu.getRobotYawPitchRollAngles().getYaw(angleUnit);
+        if(useIMU) {
+            return imu.getRobotYawPitchRollAngles().getYaw(angleUnit);
+        }
+        else{
+            return heading;
+        }
     }
     /**
     * Reset the IMU
     */
     public void resetIMU(){
-        imu.resetYaw();
+        if(useIMU) {
+            imu.resetYaw();
+        }
     }
-    public void setHeading(){
-
+    /**
+     * Set the robot heading
+     * @param heading heading in radians
+     */
+    public void setHeading(double heading){
+        this.heading = heading;
     }
 }
