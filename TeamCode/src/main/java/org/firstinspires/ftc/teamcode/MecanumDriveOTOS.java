@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.canvas.Canvas;
@@ -137,6 +140,7 @@ public final class MecanumDriveOTOS {
         private int lastX, lastY;
         public Encoder par,perp;
         public final IMU imu;
+        private final double sensorDistance = 10.6213228931;
 
         public OTOSLocalizer(){
 
@@ -151,8 +155,8 @@ public final class MecanumDriveOTOS {
             otos.setLinearScalar(1.0);
             otos.calibrateImu();
             //OTOS virtual encoders
-            par = new OTOS_Encoder(otos,OTOS_DIRECTION.Y);
-            perp = new OTOS_Encoder(otos,OTOS_DIRECTION.X);
+            par = new OTOS_Encoder(otos,OTOS_DIRECTION.Y,10.6213228931);
+            perp = new OTOS_Encoder(otos,OTOS_DIRECTION.X,10.6213228931);
 
 
         }
@@ -160,35 +164,40 @@ public final class MecanumDriveOTOS {
         public Twist2dDual<Time> update(){
             SparkFunOTOS.Pose2D pose = otos.getPosition();
             SparkFunOTOS.Pose2D vel = otos.getVelocity();
-            PositionVelocityPair XPosVel = new PositionVelocityPair((int)pose.x*10000, (int)vel.x*10000,(int)pose.x*10000,(int)vel.x*10000);
-            PositionVelocityPair YPosVel = new PositionVelocityPair((int)pose.y*10000, (int)vel.y*10000,(int)pose.y*10000,(int)vel.y*10000);
+            PositionVelocityPair XPosVel = new PositionVelocityPair((int) pose.x * 10000, (int) vel.x * 10000,(int) pose.x * 10000,(int) vel.x * 10000);
+            PositionVelocityPair YPosVel = new PositionVelocityPair((int) pose.y * 10000, (int) vel.y * 10000,(int) pose.y * 10000,(int) vel.y * 10000);
             Rotation2d heading = Rotation2d.exp(pose.h);
             double headingVel = vel.h;
             if(!initialized){
                 initialized = true;
                 lastHeading = heading;
-                lastX = (int) pose.x*10000;
-                lastY = (int) pose.y*10000;
+                lastX = (int) pose.x * 10000;
+                lastY = (int) pose.y * 10000;
                 return new Twist2dDual<>(
                         Vector2dDual.constant(new Vector2d(0.0, 0.0), 2),
                         DualNum.constant(0.0, 2)
                 );
 
             }
-            int xDelta = (int)pose.x*10000 - lastX;
-            int yDelta = (int)pose.y*10000 - lastY;
+            int xDelta = (int) pose.x * 10000 - lastX;
+            int yDelta = (int) pose.y *10000 - lastY;
             double headingDelta = heading.minus(lastHeading);
             // subtract headingDelta/vel because when the sensor is offset from the center, the rotation affects the x and y
+            // we need to find the absolute x and y movement without the rotation
+            // With dead wheels, it simply uses the heading to find the effect of the rotation
+            // With OTOS, we need to find the effect of the rotation on the x and y with trigonometry
+            // The OTOS gets the absolute movement regardless of heading while the dead wheels turn with the robot.
             Twist2dDual<Time> twist = new Twist2dDual<>(
                     new Vector2dDual<>(
                             new DualNum<Time>(new double[] {
-                                            xDelta - (6.5*10000) * headingDelta,
-                                            XPosVel.velocity - (6.5*10000) * headingVel,
-                            }).times((double) 1 /10000),
+                                    xDelta - (sensorDistance * 10000) * sin(headingDelta),
+                                    XPosVel.velocity - (sensorDistance * 10000) * sin(headingVel),
+                            }).times((double) 1 / 10000),
                             new DualNum<Time>(new double[] {
-                                            yDelta - (-9.5*10000) * headingDelta,
-                                            YPosVel.velocity - (-9.5*10000) * headingVel,
-                            }).times((double) 1 /10000)
+                                    yDelta - (sensorDistance*10000) * cos(headingDelta),
+                                    YPosVel.velocity - (sensorDistance * 10000) * cos(headingVel),
+                            }).times((double) 1 / 10000)
+
                     ),
                     new DualNum<Time>(new double[]{
                             headingDelta,
