@@ -21,11 +21,14 @@ enum OTOS_DIRECTION{
 public class OTOS_Encoder implements Encoder {
     private final SparkFunOTOS otos;
     public OTOS_DIRECTION xOrY;
-    double offset;
-    public OTOS_Encoder(SparkFunOTOS otos,OTOS_DIRECTION direction,double offset){
+    double offsetX;
+    double offsetY;
+    public OTOS_Encoder(SparkFunOTOS otos,OTOS_DIRECTION direction,double offsetX, double offsetY){
         this.otos = otos;
         xOrY = direction;
-        this.offset = offset;
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
+
     }
     public void initOTOS(){
         otos.setLinearUnit(DistanceUnit.INCH);
@@ -67,10 +70,13 @@ public class OTOS_Encoder implements Encoder {
     public PositionVelocityPair getPositionAndVelocity() {
         SparkFunOTOS.Pose2D pose = otos.getPosition();
         SparkFunOTOS.Pose2D velocity = otos.getVelocity();
-        int px = (int) (pose.x - offset * sin(pose.h)) * 10000;
-        int py = (int) (pose.y - offset * cos(pose.h)) * 10000;
-        int vx = (int) (velocity.x - offset * sin(velocity.h)) * 10000;
-        int vy = (int) (velocity.y - offset * cos(velocity.h)) * 10000;
+        double h = pose.h;
+        //                                    xDelta + sensorX - sensorX * cos(headingDelta) - sensorY * sin(headingDelta),
+        //                                    yDelta + sensorY - sensorY * cos(headingDelta) + sensorX * sin(headingDelta),
+        int px = (int) (pose.x + offsetX - offsetX * cos(h) - offsetY * sin(h)) * 10000;
+        int py = (int) (pose.y + offsetY - offsetY * cos(h) + offsetX * sin(h)) * 10000;
+        int vx = (int) (velocity.x + offsetX - offsetX * cos(h) - offsetY * sin(h)) * 10000;
+        int vy = (int) (velocity.y + offsetY - offsetY * cos(h) + offsetX * sin(h)) * 10000;
         if(xOrY == OTOS_DIRECTION.X)
             return new PositionVelocityPair(px, vx, px, vx);
         else

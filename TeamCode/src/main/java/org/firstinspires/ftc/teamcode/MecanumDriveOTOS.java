@@ -72,7 +72,7 @@ public final class MecanumDriveOTOS {
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
 
         // drive model parameters
-        public double inPerTick = 1/10000;
+        public double inPerTick = 1/10000.0f;
         public double lateralInPerTick = inPerTick;
         public double trackWidthTicks = 0;
 
@@ -140,7 +140,8 @@ public final class MecanumDriveOTOS {
         private int lastX, lastY;
         public Encoder par,perp;
         public final IMU imu;
-        private final double sensorDistance = 10.6213228931;
+        private final double sensorX = -6.5 * 10000;
+        private final double sensorY = 9.5 * 10000;
 
         public OTOSLocalizer(){
 
@@ -155,8 +156,8 @@ public final class MecanumDriveOTOS {
             otos.setLinearScalar(1.0);
             otos.calibrateImu();
             //OTOS virtual encoders
-            par = new OTOS_Encoder(otos,OTOS_DIRECTION.Y,10.6213228931);
-            perp = new OTOS_Encoder(otos,OTOS_DIRECTION.X,10.6213228931);
+            par = new OTOS_Encoder(otos,OTOS_DIRECTION.Y,sensorX / 10000.0f,sensorY / 10000.0f);
+            perp = new OTOS_Encoder(otos,OTOS_DIRECTION.X,sensorX / 10000.0f,sensorY / 10000.0f);
 
 
         }
@@ -190,12 +191,12 @@ public final class MecanumDriveOTOS {
             Twist2dDual<Time> twist = new Twist2dDual<>(
                     new Vector2dDual<>(
                             new DualNum<Time>(new double[] {
-                                    xDelta - (sensorDistance * 10000) * sin(headingDelta),
-                                    XPosVel.velocity - (sensorDistance * 10000) * sin(headingVel),
+                                    xDelta + sensorX - sensorX * cos(headingDelta) - sensorY * sin(headingDelta),
+                                    XPosVel.velocity + sensorX - sensorX * cos(headingVel) - sensorY * sin(headingVel),
                             }).times((double) 1 / 10000),
                             new DualNum<Time>(new double[] {
-                                    yDelta - (sensorDistance*10000) * cos(headingDelta),
-                                    YPosVel.velocity - (sensorDistance * 10000) * cos(headingVel),
+                                    yDelta + sensorY - sensorY * cos(headingDelta) + sensorX * sin(headingDelta),
+                                    YPosVel.velocity + sensorY - sensorY * cos(headingVel) + sensorX * sin(headingVel)
                             }).times((double) 1 / 10000)
 
                     ),
