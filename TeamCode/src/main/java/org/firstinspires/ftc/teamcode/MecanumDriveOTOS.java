@@ -140,8 +140,10 @@ public final class MecanumDriveOTOS {
         private int lastX, lastY;
         public Encoder par,perp;
         public final IMU imu;
-        private final double sensorX = -6.5 * 10000;
-        private final double sensorY = 9.5 * 10000;
+        private final double sensorX = 6.5 * 10000;
+        private final double sensorY = -9.5 * 10000;
+        private final double sensorDistance = Math.hypot(sensorX,sensorY);
+        private final double sensorAngle = Math.atan2(sensorX,sensorY);
 
         public OTOSLocalizer(){
 
@@ -180,8 +182,8 @@ public final class MecanumDriveOTOS {
                 );
 
             }
-            int xDelta = (int) pose.x * 10000 - lastX;
-            int yDelta = (int) pose.y *10000 - lastY;
+            int xDelta = (int) (pose.x * 10000) - lastX;
+            int yDelta = (int) (pose.y * 10000) - lastY;
             double headingDelta = heading.minus(lastHeading);
             // subtract headingDelta/vel because when the sensor is offset from the center, the rotation affects the x and y
             // we need to find the absolute x and y movement without the rotation
@@ -191,13 +193,13 @@ public final class MecanumDriveOTOS {
             Twist2dDual<Time> twist = new Twist2dDual<>(
                     new Vector2dDual<>(
                             new DualNum<Time>(new double[] {
-                                    xDelta + sensorX - sensorX * cos(headingDelta) - sensorY * sin(headingDelta),
-                                    XPosVel.velocity + sensorX - sensorX * cos(headingVel) - sensorY * sin(headingVel),
-                            }).times((double) 1 / 10000),
+                                    xDelta - (cos(headingDelta) - sin(headingDelta)) * sensorX + sensorX,
+                                    XPosVel.velocity - (cos(headingVel) - sin(headingVel)) * sensorX + sensorX
+                            }).times((double) 1 / 10000.0f),
                             new DualNum<Time>(new double[] {
-                                    yDelta + sensorY - sensorY * cos(headingDelta) + sensorX * sin(headingDelta),
-                                    YPosVel.velocity + sensorY - sensorY * cos(headingVel) + sensorX * sin(headingVel)
-                            }).times((double) 1 / 10000)
+                                    yDelta - (sin(headingDelta) + cos(headingDelta)) * sensorY + sensorY,
+                                    YPosVel.velocity - (sin(headingVel) + cos(headingVel)) * sensorY + sensorY
+                            }).times((double) 1 / 10000.0f)
 
                     ),
                     new DualNum<Time>(new double[]{
@@ -327,10 +329,10 @@ public final class MecanumDriveOTOS {
 
         // TODO: make sure your config has motors with these names (or change them)
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
-        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
-        leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
-        rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
-        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+        leftFront = hardwareMap.get(DcMotorEx.class, "fl");
+        leftBack = hardwareMap.get(DcMotorEx.class, "bl");
+        rightBack = hardwareMap.get(DcMotorEx.class, "br");
+        rightFront = hardwareMap.get(DcMotorEx.class, "fr");
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

@@ -46,6 +46,8 @@ public class LocalizationTestOTOS extends LinearOpMode {
                 SparkFunOTOS.Pose2D spose = drive.otos.getPosition();
                 telemetry.addData("oX", spose.x);
                 telemetry.addData("oY", spose.y);
+                OTOS_Encoder XENC = new OTOS_Encoder(drive.otos,OTOS_DIRECTION.X,6.5,-9.5);
+                telemetry.addData("xENC",XENC.getPositionAndVelocity().position);
                 telemetry.addData("heading (deg)", Math.toDegrees(drive.pose.heading.toDouble()));
                 telemetry.update();
 

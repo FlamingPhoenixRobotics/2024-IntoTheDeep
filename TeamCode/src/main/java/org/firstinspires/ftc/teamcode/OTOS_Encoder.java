@@ -71,12 +71,16 @@ public class OTOS_Encoder implements Encoder {
         SparkFunOTOS.Pose2D pose = otos.getPosition();
         SparkFunOTOS.Pose2D velocity = otos.getVelocity();
         double h = pose.h;
-        //                                    xDelta + sensorX - sensorX * cos(headingDelta) - sensorY * sin(headingDelta),
-        //                                    yDelta + sensorY - sensorY * cos(headingDelta) + sensorX * sin(headingDelta),
-        int px = (int) (pose.x + offsetX - offsetX * cos(h) - offsetY * sin(h)) * 10000;
-        int py = (int) (pose.y + offsetY - offsetY * cos(h) + offsetX * sin(h)) * 10000;
-        int vx = (int) (velocity.x + offsetX - offsetX * cos(h) - offsetY * sin(h)) * 10000;
-        int vy = (int) (velocity.y + offsetY - offsetY * cos(h) + offsetX * sin(h)) * 10000;
+//        xDelta - (cos(headingDelta) - sin(headingDelta)) * sensorX + sensorX
+//        yDelta - (sin(headingDelta) + cos(headingDelta)) * sensorY + sensorY,
+        double cosMinusSin = cos(h) - sin(h);
+        double SinPlusCos = sin(h) + cos(h);
+
+        int px = (int) (pose.x - cosMinusSin * offsetX + offsetX) * 10000;
+        int py = (int) (pose.y - SinPlusCos * offsetY + offsetY) * 10000;
+        int vx = (int) (velocity.x - cosMinusSin * offsetX + offsetX) * 10000;
+        int vy = (int) (velocity.y - SinPlusCos * offsetY + offsetY) * 10000;
+
         if(xOrY == OTOS_DIRECTION.X)
             return new PositionVelocityPair(px, vx, px, vx);
         else
