@@ -81,115 +81,16 @@ public abstract class AutoBase extends LinearOpMode {
         imu.resetYaw();
 
     }
-    public void driveToPoint(double x_start, double y_start, double x_target, double y_target, double speed, double desiredHeading) {
-        double deltaX = x_target - x_start;
-        double deltaY = y_target - y_start;
+    public void llTune(double endX, double endY){
 
-        double distance = Math.hypot(deltaX, deltaY);
-        double directionX = deltaX / distance;
-        double directionY = deltaY / distance;
-
-        YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
-        double currentHeading = orientation.getYaw();
-
-        double headingError = desiredHeading - currentHeading;
-
-        headingError = (headingError + 360) % 360;
-        if (headingError > 180) {
-            headingError -= 360;
-        }
-
-        double kP = 0.01;
-        double headingCorrection = kP * headingError;
-
-        double flPower = directionY + directionX - headingCorrection;
-        double blPower = directionY - directionX - headingCorrection;
-        double frPower = directionY - directionX + headingCorrection;
-        double brPower = directionY + directionX + headingCorrection;
-
-        double maxPower = Math.max(Math.abs(flPower), Math.abs(blPower));
-        maxPower = Math.max(maxPower, Math.abs(frPower));
-        maxPower = Math.max(maxPower, Math.abs(brPower));
-        if (maxPower > 1.0) {
-            flPower /= maxPower;
-            blPower /= maxPower;
-            frPower /= maxPower;
-            brPower /= maxPower;
-        }
-
-        fl.setPower(flPower * speed);
-        bl.setPower(blPower * speed);
-        fr.setPower(frPower * speed);
-        br.setPower(brPower * speed);
-
-        while (!hasReachedTarget(x_target, y_target)) {
-            orientation = imu.getRobotYawPitchRollAngles();
-            currentHeading = orientation.getYaw();
-
-            headingError = desiredHeading - currentHeading;
-
-            headingError = (headingError + 360) % 360;
-            if (headingError > 180) {
-                headingError -= 360;
-            }
-
-            headingCorrection = kP * headingError;
-
-            flPower = directionY + directionX - headingCorrection;
-            blPower = directionY - directionX - headingCorrection;
-            frPower = directionY - directionX + headingCorrection;
-            brPower = directionY + directionX + headingCorrection;
-
-            maxPower = Math.max(Math.abs(flPower), Math.abs(blPower));
-            maxPower = Math.max(maxPower, Math.abs(frPower));
-            maxPower = Math.max(maxPower, Math.abs(brPower));
-            if (maxPower > 1.0) {
-                flPower /= maxPower;
-                blPower /= maxPower;
-                frPower /= maxPower;
-                brPower /= maxPower;
-            }
-
-            fl.setPower(flPower * speed);
-            bl.setPower(blPower * speed);
-            fr.setPower(frPower * speed);
-            br.setPower(brPower * speed);
-        }
-
-        fl.setPower(0);
-        bl.setPower(0);
-        fr.setPower(0);
-        br.setPower(0);
     }
 
-    private boolean hasReachedTarget(double x_target, double y_target) {
-        YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
+    public void intake(){
 
-        telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
-
-        limelight.updateRobotOrientation(orientation.getYaw(AngleUnit.DEGREES));
-        LLResult result = limelight.getLatestResult();
-        double x = 0;
-        double y = 0;
-
-        if (result != null) {
-            if (result.isValid()) {
-                Pose3D botPoseMT1 = result.getBotpose();
-
-                x = 39.3701*botPoseMT1.getPosition().x;
-                y = 39.3701*botPoseMT1.getPosition().y;
-
-            }
-        }
-        else{
-            return false;
-        }
-
-        double tolerance = 1.0;
-
-        return (Math.abs(x - x_target) < tolerance && Math.abs(y - y_target) < tolerance);
     }
+    public void outtake(){
 
+    }
 
 
 }

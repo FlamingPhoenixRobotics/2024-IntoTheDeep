@@ -48,7 +48,6 @@ public class LimeLight extends AutoBase {
 
         imu.resetYaw();
         waitForStart();
-        driveToPoint(1,1,5,5,1,1);
 
             YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
 
