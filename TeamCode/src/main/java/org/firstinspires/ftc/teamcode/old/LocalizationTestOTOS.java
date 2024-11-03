@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
-import org.firstinspires.ftc.teamcode.OTOS_DIRECTION;
+import org.firstinspires.ftc.teamcode.old.OTOS_DIRECTION;
 import org.firstinspires.ftc.teamcode.tuning.TuningOpModes;
 @TeleOp
 public class LocalizationTestOTOS extends LinearOpMode {
