@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.old;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -11,6 +11,9 @@ import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.Drawing;
+import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.OTOS_DIRECTION;
 import org.firstinspires.ftc.teamcode.tuning.TuningOpModes;
 @TeleOp
 public class LocalizationTestOTOS extends LinearOpMode {
@@ -46,7 +49,7 @@ public class LocalizationTestOTOS extends LinearOpMode {
                 SparkFunOTOS.Pose2D spose = drive.otos.getPosition();
                 telemetry.addData("oX", spose.x);
                 telemetry.addData("oY", spose.y);
-                OTOS_Encoder XENC = new OTOS_Encoder(drive.otos,OTOS_DIRECTION.X,6.5,-9.5);
+                OTOS_Encoder XENC = new OTOS_Encoder(drive.otos, OTOS_DIRECTION.X,6.5,-9.5);
                 telemetry.addData("xENC",XENC.getPositionAndVelocity().position);
                 telemetry.addData("heading (deg)", Math.toDegrees(drive.pose.heading.toDouble()));
                 telemetry.update();

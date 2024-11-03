@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.old;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
@@ -52,6 +52,9 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.Drawing;
+import org.firstinspires.ftc.teamcode.Localizer;
+import org.firstinspires.ftc.teamcode.OTOS_DIRECTION;
 import org.firstinspires.ftc.teamcode.messages.DriveCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.MecanumCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.PoseMessage;
@@ -158,7 +161,7 @@ public final class MecanumDriveOTOS {
             otos.setLinearScalar(1.0);
             otos.calibrateImu();
             //OTOS virtual encoders
-            par = new OTOS_Encoder(otos,OTOS_DIRECTION.Y,sensorX / 10000.0f,sensorY / 10000.0f);
+            par = new OTOS_Encoder(otos, OTOS_DIRECTION.Y,sensorX / 10000.0f,sensorY / 10000.0f);
             perp = new OTOS_Encoder(otos,OTOS_DIRECTION.X,sensorX / 10000.0f,sensorY / 10000.0f);
 
 
