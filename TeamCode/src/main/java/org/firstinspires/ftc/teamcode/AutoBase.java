@@ -71,18 +71,18 @@ public abstract class AutoBase extends LinearOpMode {
 
         imu.initialize(new IMU.Parameters(orientationOnRobot));
 
-        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        //limelight = hardwareMap.get(Limelight3A.class, "limelight");
 
         telemetry.setMsTransmissionInterval(11);
 
-        limelight.pipelineSwitch(0);
-        limelight.start();
+        //limelight.pipelineSwitch(0);
+        //limelight.start();
 
         imu.resetYaw();
 
     }
     public void llTune(double endX, double endY){
-
+        
     }
 
     public void intake(){

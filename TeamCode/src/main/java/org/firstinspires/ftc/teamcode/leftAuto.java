@@ -24,69 +24,50 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 import com.acmerobotics.roadrunner.ParallelAction;
 @Config
 @Autonomous(name = "Skeleton", group = "Autonomous")
-public class leftAuto extends LinearOpMode{
+public class leftAuto extends AutoBase{
     @Override
     public void runOpMode() {
-        Pose2d initialPose = new Pose2d(11.8, 61.7, Math.toRadians(90));
+        initialize();
+        Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(0)); //update with real starting position
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
+        //score preload and intake sample from sub  (numbers aren't exact)
+        TrajectoryActionBuilder preload = drive.actionBuilder(initialPose)
+                //.setTangent(90)
+                .strafeTo(new Vector2d(0,10))
+                //.lineToY(10)
+                // llTune();
+                ;
+        //score sample (numbers aren't exact)
+        TrajectoryActionBuilder tab2 = drive.actionBuilder(initialPose)//this needs to be replaced with the output of previous traj
+                //.splineToSplineHeading(x,y);
+                //llTune();
+                ;
 
-        // vision here that outputs position
-        int visionOutputPosition = 1;
-
-        TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
-                .lineToYSplineHeading(33, Math.toRadians(0))
-                .waitSeconds(2)
-                .setTangent(Math.toRadians(90))
-                .lineToY(48)
-                .setTangent(Math.toRadians(0))
-                .lineToX(32)
-                .strafeTo(new Vector2d(44.5, 30))
-                .turn(Math.toRadians(180))
-                .lineToX(47.5)
-                .waitSeconds(3);
-        TrajectoryActionBuilder tab2 = drive.actionBuilder(initialPose)
-                .lineToY(37)
-                .setTangent(Math.toRadians(0))
-                .lineToX(18)
-                .waitSeconds(3)
-                .setTangent(Math.toRadians(0))
-                .lineToXSplineHeading(46, Math.toRadians(180))
-                .waitSeconds(3);
-        TrajectoryActionBuilder tab3 = drive.actionBuilder(initialPose)
-                .lineToYSplineHeading(33, Math.toRadians(180))
-                .waitSeconds(2)
-                .strafeTo(new Vector2d(46, 30))
-                .waitSeconds(3);
-        Action trajectoryActionCloseOut = tab1.fresh()
-                .strafeTo(new Vector2d(48, 12))
-                .build();
+        //intake from basket pos
+        TrajectoryActionBuilder tab3 = drive.actionBuilder(initialPose)//this needs to be replaced with the output of previous traj
+                //.splineTo(x,y)
+                //llTune();
+                //intakeSub();
+                ;
 
         // actions that need to happen on init; for instance, a claw tightening.
-
-
-
-        while (!isStopRequested() && !opModeIsActive()) {
-            int position = visionOutputPosition;
-            telemetry.addData("Position during Init", position);
-            telemetry.update();
-        }
-
-        int startPosition = visionOutputPosition;
-        telemetry.addData("Starting Position", startPosition);
-        telemetry.update();
+        //intake();
         waitForStart();
 
         if (isStopRequested()) return;
+        Actions.runBlocking(new SequentialAction(preload.build())//, lift.raiseSpecimen()
+                );
+        //intakeSub();
+        /*Actions.runBlocking(new ParallelAction(tab2.build())//, lift.raiseLiftSample()
+        );
+        //outtake();
+        Actions.runBlocking(new ParallelAction(tab3.build())//, lift.setIntake()
+        );
+        //intakeSub();
+        Actions.runBlocking(new ParallelAction(tab2.build())//, lift.raiseLiftSample()
+        );*/
 
-        Action trajectoryActionChosen;
-        if (startPosition == 1) {
-            trajectoryActionChosen = tab1.build();
-        } else if (startPosition == 2) {
-            trajectoryActionChosen = tab2.build();
-        } else {
-            trajectoryActionChosen = tab3.build();
-        }
     }
 
 }
