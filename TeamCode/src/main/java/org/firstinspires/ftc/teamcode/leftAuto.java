@@ -12,7 +12,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.ftc.Actions;
+//import com.acmerobotics.roadrunner.ftc.Actions;
 
 // Non-RR imports
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -48,7 +48,7 @@ public class leftAuto extends AutoBase{
         TrajectoryActionBuilder tab3 = drive.actionBuilder(initialPose)//this needs to be replaced with the output of previous traj
                 //.splineTo(x,y)
                 //llTune();
-                //intakeSub();
+                //intakeSub(); 
                 ;
 
         // actions that need to happen on init; for instance, a claw tightening.
@@ -56,8 +56,8 @@ public class leftAuto extends AutoBase{
         waitForStart();
 
         if (isStopRequested()) return;
-        Actions.runBlocking(new SequentialAction(preload.build())//, lift.raiseSpecimen()
-                );
+        //Actions.runBlocking(new SequentialAction(preload.build())//, lift.raiseSpecimen()
+                //);
         //intakeSub();
         /*Actions.runBlocking(new ParallelAction(tab2.build())//, lift.raiseLiftSample()
         );

@@ -15,8 +15,8 @@ import com.qualcomm.robotcore.hardware.Servo;
  */
 @TeleOp
 public class FindServoPosition extends OpMode {
-    String[] servoNames ={"claw"};
-    Servo[] servos;
+    String[] servoNames ={"linkage"};
+    Servo[] servos = new Servo[3];
     int selectedServo = 0;
     int incrementMultiplier = 1;
     boolean didchange = false;
