@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.utility;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.exp;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -87,7 +88,7 @@ public class FieldCentricDrive {
      * More functionality because of more access to controls
      * @param gamepad1 gamepad 1
      */
-    public void drive(Gamepad gamepad1){
+    public void drive(Gamepad gamepad1, double exponent){
         double x = -gamepad1.left_stick_x*1.1;
         double y = gamepad1.left_stick_y;
         double rx = -gamepad1.right_stick_x;
@@ -118,10 +119,10 @@ public class FieldCentricDrive {
         brp = brp * (1 + 2*gamepad1.left_trigger);
 
 
-        fl.setPower(0.74*flp);
-        bl.setPower(0.74*blp);
-        fr.setPower(0.74*frp);
-        br.setPower(0.74*brp);
+        fl.setPower(Math.pow((0.74*flp),exponent));
+        bl.setPower(Math.pow((0.74*blp),exponent));
+        fr.setPower(Math.pow((0.74*frp), exponent));
+        br.setPower(Math.pow((0.74*brp),exponent));;
     }
     /**
      * Get robot heading in radians
