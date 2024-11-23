@@ -119,10 +119,10 @@ public class FieldCentricDrive {
         brp = brp * (1 + 2*gamepad1.left_trigger);
 
 
-        fl.setPower(Math.pow((0.74*flp),exponent));
-        bl.setPower(Math.pow((0.74*blp),exponent));
-        fr.setPower(Math.pow((0.74*frp), exponent));
-        br.setPower(Math.pow((0.74*brp),exponent));;
+        fl.setPower(Math.pow((0.8*flp),exponent));
+        bl.setPower(Math.pow((0.8*blp),exponent));
+        fr.setPower(Math.pow((0.8*frp), exponent));
+        br.setPower(Math.pow((0.8*brp),exponent));;
     }
     /**
      * Get robot heading in radians
