@@ -48,7 +48,7 @@ public abstract class AutoBase extends LinearOpMode {
     DcMotor bl;
     private Limelight3A limelight;
     IMU imu;
-
+    public float PPR = 537.7f;
 
 
 
@@ -90,6 +90,35 @@ public abstract class AutoBase extends LinearOpMode {
     }
     public void outtake(){
 
+    }
+    public void Drive(double distance){
+        double x = (PPR * distance)/(2 * (float)Math.PI);
+
+        long targetEncoderValue = Math.round(x);
+
+        fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        int currentPosition = 0;
+
+        while (currentPosition < targetEncoderValue && opModeIsActive()) {
+            currentPosition = Math.abs(fr.getCurrentPosition());
+
+            fl.setPower(0.2f);
+            fr.setPower(0.2f);
+            bl.setPower(0.2f);
+            br.setPower(0.2f);
+            telemetry.addData("Current Pos %d", currentPosition);
+            telemetry.addData("target", targetEncoderValue);
+            telemetry.update();
+        }
+        StopAllWheels();
+
+    }
+    public void StopAllWheels(){
+        fr.setPower(0);
+        fl.setPower(0);
+        br.setPower(0);
+        bl.setPower(0);
     }
 
 

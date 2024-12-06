@@ -88,10 +88,10 @@ public class FieldCentricDrive {
      * More functionality because of more access to controls
      * @param gamepad1 gamepad 1
      */
-    public void drive(Gamepad gamepad1, double exponent){
+    public void drive(Gamepad gamepad1, int exponent){
         double x = -gamepad1.left_stick_x*1.1;
         double y = gamepad1.left_stick_y;
-        double rx = -gamepad1.right_stick_x;
+        double rx = 0.65-gamepad1.right_stick_x;
         double botHeading;
         if(useIMU) {
             botHeading= -imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);//might be degrees

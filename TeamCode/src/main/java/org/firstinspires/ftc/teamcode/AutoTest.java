@@ -24,17 +24,18 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import com.acmerobotics.roadrunner.ParallelAction;
 @Config
-@Autonomous(name = "Skeleton", group = "Autonomous")
-public class leftAuto extends AutoBase{
+@Autonomous
+public class AutoTest extends AutoBase{
     @Override
     public void runOpMode() {
+        initialize();
         Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(0)); //update with real starting position
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
         //score preload and intake sample from sub  (numbers aren't exact)
         TrajectoryActionBuilder preload = drive.actionBuilder(initialPose)
                 //.setTangent(90)
-                .lineToX(20)
+                .splineTo(new Vector2d(10,0), Math.toRadians(0))
                 // llTune();
                 ;
         //score sample (numbers aren't exact)
@@ -48,7 +49,7 @@ public class leftAuto extends AutoBase{
         TrajectoryActionBuilder tab3 = drive.actionBuilder(initialPose)//this needs to be replaced with the output of previous traj
                 //.splineTo(x,y)
                 //llTune();
-                //intakeSub(); 
+                //intakeSub();
                 ;
 
         // actions that need to happen on init; for instance, a claw tightening.
@@ -57,7 +58,7 @@ public class leftAuto extends AutoBase{
 
         if (isStopRequested()) return;
         Actions.runBlocking(new SequentialAction(preload.build())//, lift.raiseSpecimen()
-                );
+        );
         //intakeSub();
         /*Actions.runBlocking(new ParallelAction(tab2.build())//, lift.raiseLiftSample()
         );
@@ -69,5 +70,4 @@ public class leftAuto extends AutoBase{
         );*/
 
     }
-
 }

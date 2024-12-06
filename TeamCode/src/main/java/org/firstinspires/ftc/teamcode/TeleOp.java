@@ -20,7 +20,7 @@ public class TeleOp extends OpMode {
     double liftPos = 0;
     boolean highReached = true;
     boolean reset = false;
-    float exp = 1;
+    int exp = 1;
     @Override
     public void init() {
         drive = new FieldCentricDrive(hardwareMap, true);
@@ -29,16 +29,16 @@ public class TeleOp extends OpMode {
         intakeL = hardwareMap.crservo.get("intakeL");
         intakeR = hardwareMap.crservo.get("intakeR");
         linkage = hardwareMap.servo.get("linkage");
-        liftL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        liftL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        liftR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        liftR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         linkage.setPosition(0);
 
     }
 
     @Override
     public void loop() {
-        drive.drive(gamepad1,exp);
-        liftL.setPower(gamepad2.right_stick_y);
+        //drive.drive(gamepad1,exp);
+        liftL.setPower(-gamepad2.right_stick_y);
         liftR.setPower(-gamepad2.right_stick_y);
         if(gamepad1.right_stick_button){
             drive.resetIMU();
@@ -85,9 +85,10 @@ public class TeleOp extends OpMode {
             highReached = false;
         }
         if(Math.abs(gamepad2.right_stick_y)<0.1){
-            liftL.setPower(-0.15);
+            liftL.setPower(0.15);
             liftR.setPower(0.15);
-        }
+        }//-2850
+        //-2672
         if(!highReached){
             if (liftPos>-4700){
                 liftR.setPower(1);
@@ -103,7 +104,7 @@ public class TeleOp extends OpMode {
         else{
             exp = 1;
         }
-        liftPos = liftL.getCurrentPosition();
+        liftPos = liftR.getCurrentPosition();
         telemetry.addData("things: ", liftPos);
         telemetry.update();
     }
