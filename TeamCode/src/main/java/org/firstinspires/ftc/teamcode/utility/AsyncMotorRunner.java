@@ -15,13 +15,19 @@ public class AsyncMotorRunner {
 
     /**
      * Constructor for AsyncMotorRunner
-     * @param motor
-     * @param power
+     * @param motor The motor to run
+     * @param power The power to run the motor at
      */
     public AsyncMotorRunner(DcMotorEx motor, int power){
         this.motor = motor;
         this.power = power;
     }
+    /**
+     * Constructor for DualAsyncMotorRunner
+     * @param motor The motor to run
+     * @param motor2 The second motor to run
+     * @param power The power to run the motor at
+     */
     public AsyncMotorRunner(DcMotorEx motor, DcMotorEx motor2, int power){
         this.motor = motor;
         this.motor2 = motor2;
@@ -34,6 +40,11 @@ public class AsyncMotorRunner {
         this.power = power;
     }
 
+    /**
+     * Runs the motor to the target position
+     * Call in the main loop
+     * @return
+     */
     public int runNormal(){
         if(motor.getCurrentPosition() < targetPosition){
             motor.setPower(power);
@@ -48,6 +59,13 @@ public class AsyncMotorRunner {
             return 0;
         }
     }
+
+    /**
+     * Use with dual motors
+     * Runs the motor to the target position
+     * Call in the main loop
+     * @return
+     */
     public int runDual(){
         if(motor.getCurrentPosition() < targetPosition){
             motor.setPower(power);
