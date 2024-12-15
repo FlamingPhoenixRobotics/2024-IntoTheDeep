@@ -62,7 +62,7 @@ public abstract class AutoBase extends LinearOpMode {
         fl = hardwareMap.dcMotor.get("fl");
         br = hardwareMap.dcMotor.get("br");
         bl = hardwareMap.dcMotor.get("bl");
-        fr.setDirection(DcMotorSimple.Direction.REVERSE);
+        /*fr.setDirection(DcMotorSimple.Direction.REVERSE);
         br.setDirection(DcMotorSimple.Direction.REVERSE);
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
@@ -78,7 +78,7 @@ public abstract class AutoBase extends LinearOpMode {
         //limelight.pipelineSwitch(0);
         //limelight.start();
 
-        imu.resetYaw();
+        imu.resetYaw();*/
 
     }
     public void llTune(double endX, double endY){
