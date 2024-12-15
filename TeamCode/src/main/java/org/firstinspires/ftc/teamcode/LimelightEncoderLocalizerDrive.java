@@ -113,7 +113,7 @@ public class LimelightEncoderLocalizerDrive extends MecanumDrive {
             */
 
             lastLLPose = LLpose;
-            lastLLVelocity = LLvelocity;
+//            lastLLVelocity = LLvelocity;
 
 
             //get pose
@@ -132,6 +132,7 @@ public class LimelightEncoderLocalizerDrive extends MecanumDrive {
             // If Limelight cannot find target, use drive encoder localizer
             Twist2dDual<Time> twist = localizer.update();
             pose = pose.plus(twist.value());
+            lastLLPose = pose;
 
             poseHistory.add(pose);
             while (poseHistory.size() > 100) {
@@ -143,6 +144,4 @@ public class LimelightEncoderLocalizerDrive extends MecanumDrive {
             return twist.velocity().value();
         }
     }
-
-
 }

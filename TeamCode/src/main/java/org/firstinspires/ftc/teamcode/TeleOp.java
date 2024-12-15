@@ -37,7 +37,7 @@ public class TeleOp extends OpMode {
 
     @Override
     public void loop() {
-        //drive.drive(gamepad1,exp);
+        drive.drive(gamepad1,exp);
         liftL.setPower(-gamepad2.right_stick_y);
         liftR.setPower(-gamepad2.right_stick_y);
         if(gamepad1.right_stick_button){
@@ -63,7 +63,7 @@ public class TeleOp extends OpMode {
             linkage.setPosition(0);
             linkPos = 0;
         }
-        /*if(gamepad2.dpad_up){
+        if(gamepad2.dpad_up){
             if(linkPos<0.5){
                 linkPos+=0.025;
                 linkage.setPosition(linkPos);
@@ -74,7 +74,7 @@ public class TeleOp extends OpMode {
                 linkPos-=0.025;
                 linkage.setPosition(linkPos);
             }
-        }*/
+        }
         if(gamepad1.dpad_left){
         }
         if(gamepad1.dpad_right){
@@ -82,7 +82,7 @@ public class TeleOp extends OpMode {
         if(gamepad1.left_bumper){
         }
         if(gamepad1.dpad_right){
-            highReached = false;
+//            highReached = false;
         }
         if(Math.abs(gamepad2.right_stick_y)<0.1){
             liftL.setPower(0.15);
