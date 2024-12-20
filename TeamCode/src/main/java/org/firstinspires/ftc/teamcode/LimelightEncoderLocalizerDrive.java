@@ -95,8 +95,8 @@ public class LimelightEncoderLocalizerDrive extends MecanumDrive {
             double y_MT2 = botPoseMT2.getPosition().y;
 
             // Delta time for velocity calculation
-            double deltatime = timer.milliseconds() - lastTime;
-            lastTime = timer.milliseconds()/1000; // divide by 1000 to convert to seconds
+            double deltatime = timer.milliseconds()/1000.0f - lastTime;
+            lastTime = timer.milliseconds()/1000.0f; // divide by 1000 to convert to seconds
 
             // Calculate pose, velocity, and acceleration
             LLpose = new Pose2d(x_MT2, y_MT2, orientation.getYaw(AngleUnit.RADIANS) - headingOffset);
