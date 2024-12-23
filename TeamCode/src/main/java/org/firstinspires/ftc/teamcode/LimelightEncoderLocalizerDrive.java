@@ -40,7 +40,6 @@ public class LimelightEncoderLocalizerDrive extends MecanumDrive {
     Pose2d lastLLVelocity = new Pose2d(0, 0, 0);
     //Pose2d lastLLAcceleration = new Pose2d(0, 0, 0);
     private final DownsampledWriter estimatedPoseWriter = new DownsampledWriter("ESTIMATED_POSE", 50_000_000);
-
     public LimelightEncoderLocalizerDrive(HardwareMap hardwareMap, Pose2d pose) {
         super(hardwareMap, pose);
         // Initialize Limelight

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -29,13 +30,20 @@ public class LimelightDriveTest extends LinearOpMode {
                     ),
                     -gamepad1.right_stick_x
             ));
-
             drive.updatePoseEstimate();
 
             telemetry.addData("x", drive.pose.position.x);
             telemetry.addData("y", drive.pose.position.y);
             telemetry.addData("heading (deg)", Math.toDegrees(drive.pose.heading.toDouble()));
             telemetry.update();
+            if(gamepad1.a){
+                Action goback = drive.actionBuilder(drive.pose)
+                        //go to 0,0 by using the current pose as the starting pose
+                        //the function strafeTo is used to move the robot by the desired amount, so we have to calculate the amount to move
+                        .strafeTo(new Vector2d(-drive.pose.position.x,-drive.pose.position.y))
+                        .build();
+                com.acmerobotics.roadrunner.ftc.Actions.runBlocking(goback);
+            }
 
             TelemetryPacket packet = new TelemetryPacket();
             packet.fieldOverlay().setStroke("#3F51B5");
