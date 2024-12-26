@@ -58,7 +58,7 @@ public class SpecimenAuto extends LinearOpMode {
         );
 
         TrajectoryActionBuilder moveForward = drive.actionBuilder(initialPose)
-                .splineToConstantHeading(new Vector2d(7,-36),Math.toRadians(90));
+                .splineToConstantHeading(new Vector2d(5,-33),Math.toRadians(90));
         TrajectoryActionBuilder samplesToZone = moveForward.endTrajectory().fresh()
                 .setTangent(0)
                 .splineToSplineHeading(new Pose2d(stationPos.x,stationPos.y,Math.atan2(-24-stationPos.y,samplesPoss[0]-stationPos.x)),Math.toRadians(0))
@@ -119,16 +119,21 @@ public class SpecimenAuto extends LinearOpMode {
                 .stopAndAdd(dropOff)
                 .splineToSplineHeading(new Pose2d(40,-40,Math.toRadians(0)),Math.toRadians(200))
                 .splineToLinearHeading(new Pose2d(38,-58,0),Math.toRadians(0));
-        TrajectoryActionBuilder cycleTo = samplesToZone.endTrajectory().fresh()
-//                .setTangent(Math.toRadians(-90))
-//                .splineToConstantHeading(new Vector2d(48,-60),Math.toRadians(-90))
-//                .splineToLinearHeading(new Pose2d(48,-42,Math.toRadians(-89.99999)),Math.toRadians(0))
-//                .strafeTo(new Vector2d(48,-60))
+        TrajectoryActionBuilder cycles = samplesToZone.endTrajectory().fresh()
                 .setTangent(Math.toRadians(180))
-                .splineToLinearHeading(new Pose2d(7,-33,Math.toRadians(90.000001)),Math.toRadians(90));
-        TrajectoryActionBuilder cycleBack = cycleTo.endTrajectory().fresh()
+                .splineToLinearHeading(new Pose2d(8,-33,Math.toRadians(90.000001)),Math.toRadians(90))
                 .setTangent(Math.toRadians(-90))
-                .splineToLinearHeading(new Pose2d(38,-58,Math.toRadians(0)),Math.toRadians(0));
+                .splineToLinearHeading(new Pose2d(38,-58,Math.toRadians(0)),Math.toRadians(0))
+                .setTangent(Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(4,-33,Math.toRadians(90.000001)),Math.toRadians(90))
+                .setTangent(Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(38,-58,Math.toRadians(0)),Math.toRadians(0))
+                .setTangent(Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(2,-33,Math.toRadians(90.000001)),Math.toRadians(90))
+                .setTangent(Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(38,-58,Math.toRadians(0)),Math.toRadians(0))
+                .setTangent(Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(0,-33,Math.toRadians(90.000001)),Math.toRadians(90));
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
