@@ -15,4 +15,10 @@ public class UnitConversions {
     public static final double FEET_TO_INCH = 12;
     public static final double RAD_TO_DEG = 57.2958;
     public static final double DEG_TO_RAD = 0.0174533;
+    public static double inToMM(double in){
+        return in*INCH_TO_MM;
+    }
+    public static double mmToIn(double mm){
+        return mm*MM_TO_INCH;
+    }
 }

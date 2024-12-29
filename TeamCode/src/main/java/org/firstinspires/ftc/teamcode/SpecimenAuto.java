@@ -50,7 +50,7 @@ public class SpecimenAuto extends LinearOpMode {
         );
         Action dropOff = new SequentialAction(
                 linkage.extendLinkage(17),
-                new SleepAction(1000),
+                new SleepAction(500),
                 intake.intakeOut(),
                 new SleepAction(500),
                 intake.intakeStop(),
@@ -68,7 +68,7 @@ public class SpecimenAuto extends LinearOpMode {
                                 linkage.extendLinkage(10.6),
                                 intake.intakeIn()
                         ),
-                        new SleepAction(1000),
+                        new SleepAction(500),
                         lift.liftUp(0),
                         new SleepAction(500),
                         intake.intakeStop(),
@@ -84,39 +84,39 @@ public class SpecimenAuto extends LinearOpMode {
 
                 .turnTo(Math.atan2(-24-stationPos.y,samplesPoss[1]-stationPos.x))
 
-                .stopAndAdd(new SequentialAction(
-                        new ParallelAction(
-                                linkage.extendLinkage(15.7),
-                                intake.intakeIn()
-                        ),
-                        new SleepAction(1000),
-                        lift.liftUp(0),
-                        new SleepAction(500),
-                        intake.intakeStop(),
-                        lift.liftUp(100),
-                        linkage.extendLinkage(0)
-                ))
-                .afterTime(1,
-                        linkage.extendLinkage(17))
+//                .stopAndAdd(new SequentialAction(
+//                        new ParallelAction(
+//                                linkage.extendLinkage(15.7),
+//                                intake.intakeIn()
+//                        ),
+//                        new SleepAction(1000),
+//                        lift.liftUp(0),
+//                        new SleepAction(500),
+//                        intake.intakeStop(),
+//                        lift.liftUp(100),
+//                        linkage.extendLinkage(0)
+//                ))
+//                .afterTime(1,
+//                        linkage.extendLinkage(17))
 
                 .turnTo(obsZoneHeading)
-                .stopAndAdd(dropOff)
+//                .stopAndAdd(dropOff)
 
                 .splineToLinearHeading(new Pose2d(stationPos2,Math.atan2(-24-stationPos2.y,samplesPoss[2]-stationPos2.x)),Math.toRadians(0))
-                .stopAndAdd(new SequentialAction(
-                        new ParallelAction(
-                                linkage.extendLinkage(18.5),
-                                intake.intakeIn()
-                        ),
-                        new SleepAction(1000),
-                        lift.liftUp(0),
-                        new SleepAction(500),
-                        intake.intakeStop(),
-                        lift.liftUp(100),
-                        linkage.extendLinkage(0)
-                ))
+//                .stopAndAdd(new SequentialAction(
+//                        new ParallelAction(
+//                                linkage.extendLinkage(18.5),
+//                                intake.intakeIn()
+//                        ),
+//                        new SleepAction(1000),
+//                        lift.liftUp(0),
+//                        new SleepAction(500),
+//                        intake.intakeStop(),
+//                        lift.liftUp(100),
+//                        linkage.extendLinkage(0)
+//                ))
                 .turnTo(Math.atan2(-60-stationPos2.y,60-stationPos2.x))
-                .stopAndAdd(dropOff)
+//                .stopAndAdd(dropOff)
                 .splineToSplineHeading(new Pose2d(40,-40,Math.toRadians(0)),Math.toRadians(200))
                 .splineToLinearHeading(new Pose2d(38,-58,0),Math.toRadians(0));
         TrajectoryActionBuilder cycles = samplesToZone.endTrajectory().fresh()
@@ -140,8 +140,10 @@ public class SpecimenAuto extends LinearOpMode {
         telemetry.addData("Status", "Running");
         telemetry.update();
         Actions.runBlocking(new SequentialAction(
+                lift.liftUp(100),
                 moveForward.build(),
                 samplesToZone.build()
+//                cycles.build()
         ));
     }
 }
