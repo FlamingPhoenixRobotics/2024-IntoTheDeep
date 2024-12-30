@@ -140,9 +140,10 @@ public class SpecimenAuto extends LinearOpMode {
         telemetry.addData("Status", "Running");
         telemetry.update();
         Actions.runBlocking(new SequentialAction(
-                lift.liftUp(100),
-                moveForward.build(),
-                samplesToZone.build()
+                linkage.extendLinkage(10),
+                lift.liftUp(-150)
+//                moveForward.build(),
+//                samplesToZone.build()
 //                cycles.build()
         ));
     }

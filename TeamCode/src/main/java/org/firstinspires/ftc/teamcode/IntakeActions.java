@@ -27,6 +27,10 @@ public class IntakeActions {
             liftR = hardwareMap.get(DcMotorEx.class, "liftr");
             liftL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             liftR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            liftL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            liftR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            liftL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            liftR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             liftL.setDirection(DcMotorSimple.Direction.FORWARD);
             liftR.setDirection(DcMotorSimple.Direction.FORWARD); //lol they are reversed electrically. if the wire motoring is correct then change this.
         }
@@ -36,43 +40,19 @@ public class IntakeActions {
             private final int targetPos;
             private boolean up = true;
             public LiftUp(int targetPos){
-                this.targetPos = targetPos;
+                this.targetPos = -targetPos;
             }
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    if(targetPos> -liftL.getCurrentPosition()){
-                        up = true;
-                        liftL.setPower(0.8);
-                        liftR.setPower(0.8);
-                    } else {
-                        up = false;
-                        liftL.setPower(-0.8);
-                        liftR.setPower(-0.8);
-                    }
-                    initialized = true;
-                }
-
-                double pos = -liftL.getCurrentPosition();
-                if(Math.abs(targetPos - pos) < 50){
-                    if(up){
-                        liftL.setPower(0.2);
-                        liftR.setPower(0.2);
-                    } else {
-                        liftL.setPower(-0.2);
-                        liftR.setPower(-0.2);
-                    }
-                    return true;
-                }
-
-                packet.put("liftPos", pos);
-                if(Math.abs(targetPos - pos) < 10){
-                    liftL.setPower(0);
-                    liftR.setPower(0);
+                if(targetPos < liftL.getCurrentPosition()){
+                    liftL.setPower(0.8);
+                    liftR.setPower(0.8);
                     return true;
                 }
                 else{
+                    liftL.setPower(0.1);
+                    liftR.setPower(0.1);
                     return false;
                 }
             }
@@ -83,25 +63,29 @@ public class IntakeActions {
 
         public class LiftDown implements Action {
             private boolean initialized = false;
+            private int targetpos;
+            public LiftDown(int targetpos){
+                this.targetpos = -targetpos;
+            }
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    liftL.setPower(-0.8);
-                    initialized = true;
-                }
-                double pos = liftL.getCurrentPosition();
-                packet.put("liftPos", pos);
-                if (pos > 10.0) {
+                if(targetpos > liftL.getCurrentPosition()){
+                    //150
+                    //0
+                    liftL.setPower(-0.5);
+                    liftR.setPower(-0.5);
                     return true;
-                } else {
+                }
+                else{
                     liftL.setPower(0);
+                    liftR.setPower(0);
                     return false;
                 }
             }
         }
-        public Action liftDown() {
-            return new LiftDown();
+        public Action liftDown(int targetpos) {
+            return new LiftDown(targetpos);
         }
     }
     public static class Intake{
@@ -232,7 +216,7 @@ public class IntakeActions {
 
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                linkageArm.setLen(UnitConversions.mmToIn(length));
+                linkageArm.setLen(UnitConversions.inToMM(length));
                 return false;
             }
         }
