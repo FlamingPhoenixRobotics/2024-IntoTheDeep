@@ -9,7 +9,9 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
+import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.VelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -30,110 +32,75 @@ public class SpecimenAuto extends LinearOpMode {
 
         ServoDegreeController sdc=  new ServoDegreeController(hardwareMap.get(Servo.class,"linkage"),255);
         IntakeActions.Linkage linkage = new IntakeActions.Linkage(sdc);
-
         //ALL TRAJECTORIES
         int[] samplesPoss = new int[] {48,58,68};
-        Vector2d stationPos = new Vector2d(42,-42);
+        Vector2d stationPos = new Vector2d(30,-36);
         Vector2d stationPos2 = new Vector2d(48,-42);
-        double obsZoneHeading = Math.atan2(-60 - stationPos.y, 60 - stationPos.x);
-        Action pickUp1 = new SequentialAction(
-                new ParallelAction(
-                        linkage.extendLinkage(10.6),
-                        intake.intakeIn()
-                ),
-                new SleepAction(1000),
-                lift.liftUp(0),
-                new SleepAction(500),
-                intake.intakeStop(),
-                lift.liftUp(100),
-                linkage.extendLinkage(0)
-        );
-        Action dropOff = new SequentialAction(
-                linkage.extendLinkage(17),
-                new SleepAction(500),
-                intake.intakeOut(),
-                new SleepAction(500),
-                intake.intakeStop(),
-                linkage.extendLinkage(0)
-        );
+        double obsZoneHeading = Math.atan2(-60 - -48, 60 - 36);
+        VelConstraint normal = new TranslationalVelConstraint(60);
+        //basically once entering the observation slow set max speed to 10in/s
+        VelConstraint obszoneslow = (robotPose,_path,_disp) -> {if(robotPose.position.y.value()<-60){return 10;} else{return 60;}};
+//        Pose2d initialPose = new Pose2d(12, -60, Math.toRadians(90)); //update with real starting position
 
-        TrajectoryActionBuilder moveForward = drive.actionBuilder(initialPose)
-                .splineToConstantHeading(new Vector2d(5,-33),Math.toRadians(90));
-        TrajectoryActionBuilder samplesToZone = moveForward.endTrajectory().fresh()
-                .setTangent(0)
-                .splineToSplineHeading(new Pose2d(stationPos.x,stationPos.y,Math.atan2(-24-stationPos.y,samplesPoss[0]-stationPos.x)),Math.toRadians(0))
-
-                .stopAndAdd(new SequentialAction(
-                        new ParallelAction(
-                                linkage.extendLinkage(10.6),
-                                intake.intakeIn()
-                        ),
-                        new SleepAction(500),
-                        lift.liftUp(0),
-                        new SleepAction(500),
-                        intake.intakeStop(),
-                        lift.liftUp(100),
-                        linkage.extendLinkage(0)
-                ))
-                .afterTime(1,
-                        linkage.extendLinkage(17))
-
-                .turnTo(obsZoneHeading)
-
-                .stopAndAdd(dropOff)
-
-                .turnTo(Math.atan2(-24-stationPos.y,samplesPoss[1]-stationPos.x))
-
-//                .stopAndAdd(new SequentialAction(
-//                        new ParallelAction(
-//                                linkage.extendLinkage(15.7),
-//                                intake.intakeIn()
-//                        ),
-//                        new SleepAction(1000),
-//                        lift.liftUp(0),
-//                        new SleepAction(500),
-//                        intake.intakeStop(),
-//                        lift.liftUp(100),
-//                        linkage.extendLinkage(0)
-//                ))
-//                .afterTime(1,
-//                        linkage.extendLinkage(17))
-
-                .turnTo(obsZoneHeading)
-//                .stopAndAdd(dropOff)
-
-                .splineToLinearHeading(new Pose2d(stationPos2,Math.atan2(-24-stationPos2.y,samplesPoss[2]-stationPos2.x)),Math.toRadians(0))
-//                .stopAndAdd(new SequentialAction(
-//                        new ParallelAction(
-//                                linkage.extendLinkage(18.5),
-//                                intake.intakeIn()
-//                        ),
-//                        new SleepAction(1000),
-//                        lift.liftUp(0),
-//                        new SleepAction(500),
-//                        intake.intakeStop(),
-//                        lift.liftUp(100),
-//                        linkage.extendLinkage(0)
-//                ))
-                .turnTo(Math.atan2(-60-stationPos2.y,60-stationPos2.x))
-//                .stopAndAdd(dropOff)
-                .splineToSplineHeading(new Pose2d(40,-40,Math.toRadians(0)),Math.toRadians(200))
-                .splineToLinearHeading(new Pose2d(38,-58,0),Math.toRadians(0));
-        TrajectoryActionBuilder cycles = samplesToZone.endTrajectory().fresh()
-                .setTangent(Math.toRadians(180))
-                .splineToLinearHeading(new Pose2d(8,-33,Math.toRadians(90.000001)),Math.toRadians(90))
+        //NOTE TO HUMAN PLAYER: QUICKLY SNATCH FIRST SAMPLE AFTER ROBOT FULLY LEAVES ZONE
+        //AND CREATE A SPECIMEN TO HANG ON WALL ABOVE TILE SEAM
+        TrajectoryActionBuilder allActions = drive.actionBuilder(initialPose)
+                .splineToConstantHeading(new Vector2d(5,-33),Math.toRadians(90),normal)
                 .setTangent(Math.toRadians(-90))
-                .splineToLinearHeading(new Pose2d(38,-58,Math.toRadians(0)),Math.toRadians(0))
-                .setTangent(Math.toRadians(180))
-                .splineToLinearHeading(new Pose2d(4,-33,Math.toRadians(90.000001)),Math.toRadians(90))
-                .setTangent(Math.toRadians(-90))
-                .splineToLinearHeading(new Pose2d(38,-58,Math.toRadians(0)),Math.toRadians(0))
-                .setTangent(Math.toRadians(180))
-                .splineToLinearHeading(new Pose2d(2,-33,Math.toRadians(90.000001)),Math.toRadians(90))
-                .setTangent(Math.toRadians(-90))
-                .splineToLinearHeading(new Pose2d(38,-58,Math.toRadians(0)),Math.toRadians(0))
-                .setTangent(Math.toRadians(180))
-                .splineToLinearHeading(new Pose2d(0,-33,Math.toRadians(90.000001)),Math.toRadians(90));
+                .splineToLinearHeading(new Pose2d(18,-42,Math.atan2(-24-stationPos.y,samplesPoss[0]-stationPos.x)+0.5), 0)
+                .afterTime(0.9,
+                        linkage.extendLinkage(14)
+                )
+                .splineToSplineHeading(new Pose2d(stationPos.x,stationPos.y,Math.atan2(-24-stationPos.y,samplesPoss[0]-stationPos.x)+0.12),Math.toRadians(45))//linakge to 14 inch
+                .waitSeconds(0.1)
+                .setTangent(-45)
+                .splineToSplineHeading(new Pose2d(36,-48,Math.atan2(-62 - -48, 60 - 36)),Math.toRadians(-45))//linakge to 6-8 inch
+                .afterTime(0.1,
+                        linkage.extendLinkage(8)
+                )
+                .splineToLinearHeading(new Pose2d(40,-36,Math.atan2(-24- -36,samplesPoss[1]-40)+0.12),Math.toRadians(75))
+                //linkage to 14 inch
+                .stopAndAdd(
+                        linkage.extendLinkage(14)
+                )
+                .waitSeconds(0.5)
+                .setTangent(Math.toRadians(-75))
+                .splineToSplineHeading(new Pose2d(42,-48,Math.atan2(-62 - -48, 60 - 42)),Math.toRadians(-75))
+                .afterTime(0.2,
+                        linkage.extendLinkage(8)
+                )
+                .splineToLinearHeading(new Pose2d(46,-36,Math.atan2(-24- -36,samplesPoss[2]-50)),Math.toRadians(45))
+                .stopAndAdd(linkage.extendLinkage(14))
+                .waitSeconds(0.5)
+                .setTangent(Math.toRadians(-75))
+                .splineToLinearHeading(new Pose2d(48,-48,Math.atan2(-62 - -48, 60 - 48)),Math.toRadians(-90))
+                .waitSeconds(0.1)
+                .stopAndAdd(linkage.extendLinkage(0))
+                .setTangent(90)
+                .splineToSplineHeading(new Pose2d(48,-42,Math.toRadians(-90)),Math.toRadians(90))
+//                .waitSeconds(0.4)
+                .strafeTo(new Vector2d(48,-65),obszoneslow)
+
+
+                .setTangent(Math.toRadians(110))
+                .splineToSplineHeading(new Pose2d(8,-33,Math.toRadians(90.000001)),Math.toRadians(90),normal)
+                .setTangent(Math.toRadians(-70))
+                .splineToLinearHeading(new Pose2d(48,-54,Math.toRadians(-90)),Math.toRadians(-90))
+                .splineToSplineHeading(new Pose2d(48,-65,Math.toRadians(-90)),Math.toRadians(-90),obszoneslow)
+                .setTangent(Math.toRadians(110))
+                .splineToSplineHeading(new Pose2d(4,-33,Math.toRadians(90.000001)),Math.toRadians(90),normal)
+                .setTangent(Math.toRadians(-70))
+                .splineToLinearHeading(new Pose2d(48,-54,Math.toRadians(-90)),Math.toRadians(-90))
+                .splineToSplineHeading(new Pose2d(48,-65,Math.toRadians(-90)),Math.toRadians(-90),obszoneslow)
+                .setTangent(Math.toRadians(110))
+                .splineToSplineHeading(new Pose2d(2,-33,Math.toRadians(90.000001)),Math.toRadians(90),normal)
+                .setTangent(Math.toRadians(-70))
+                .splineToLinearHeading(new Pose2d(48,-54,Math.toRadians(-90)),Math.toRadians(-90))
+                .splineToSplineHeading(new Pose2d(48,-65,Math.toRadians(-90)),Math.toRadians(-90),obszoneslow)
+                .setTangent(Math.toRadians(110))
+                .splineToSplineHeading(new Pose2d(0,-33,Math.toRadians(90.000001)),Math.toRadians(90),normal);
+
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();

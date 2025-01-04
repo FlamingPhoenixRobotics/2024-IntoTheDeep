@@ -216,7 +216,7 @@ public class IntakeActions {
 
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                linkageArm.setLen(UnitConversions.inToMM(length));
+                linkageArm.setLen(length);
                 return false;
             }
         }
