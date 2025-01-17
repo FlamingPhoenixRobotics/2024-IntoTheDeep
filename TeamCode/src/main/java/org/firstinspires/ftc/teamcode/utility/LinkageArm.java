@@ -38,7 +38,7 @@ public class LinkageArm {
      * @param inlen length in the SAME UNIT as bar1len and bar2len
      */
     public void setLen(double inlen){
-        double len = inlen-(bar2len-bar1len);
+        double len = inlen;
         double angle = Math.acos(bar1len*bar1len+len*len-(bar2len-offset)*(bar2len-offset))/(2*bar1len*len);
         motor.setPositionRadians(angle);
     }

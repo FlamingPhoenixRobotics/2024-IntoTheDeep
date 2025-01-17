@@ -48,32 +48,32 @@ public class LimeLight extends AutoBase {
 
         imu.resetYaw();
         waitForStart();
+while(opModeIsActive()) {
+    YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
 
-            YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
+    telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
 
-            telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
+    limelight.updateRobotOrientation(orientation.getYaw(AngleUnit.DEGREES));
+    LLResult result = limelight.getLatestResult();
 
-            limelight.updateRobotOrientation(orientation.getYaw(AngleUnit.DEGREES));
-            LLResult result = limelight.getLatestResult();
+    if (result != null) {
+        if (result.isValid()) {
+            Pose3D botPoseMT1 = result.getBotpose();
+            Pose3D botPoseMT2 = result.getBotpose_MT2();
 
-            if (result != null) {
-                if (result.isValid()) {
-                    Pose3D botPoseMT1 = result.getBotpose();
-                    Pose3D botPoseMT2 = result.getBotpose_MT2();
+            double x_MT1 = botPoseMT1.getPosition().x;
+            double y_MT1 = botPoseMT1.getPosition().y;
 
-                    double x_MT1 = botPoseMT1.getPosition().x;
-                    double y_MT1 = botPoseMT1.getPosition().y;
+            double x_MT2 = botPoseMT2.getPosition().x;
+            double y_MT2 = botPoseMT2.getPosition().y;
 
-                    double x_MT2 = botPoseMT2.getPosition().x;
-                    double y_MT2 = botPoseMT2.getPosition().y;
+            telemetry.addData("MT1 Location:", "(" + x_MT1 + ", " + y_MT1 + ")");
+            telemetry.addData("MT2 Location:", "(" + x_MT2 + ", " + y_MT2 + ")");
+        }
+    }
 
-                    telemetry.addData("MT1 Location:", "(" + x_MT1 + ", " + y_MT1 + ")");
-                    telemetry.addData("MT2 Location:", "(" + x_MT2 + ", " + y_MT2 + ")");
-                }
-            }
-
-            telemetry.update();
-
+    telemetry.update();
+}
 
     }
 }

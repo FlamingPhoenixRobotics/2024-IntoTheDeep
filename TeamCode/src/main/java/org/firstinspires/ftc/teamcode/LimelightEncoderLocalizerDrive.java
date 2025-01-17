@@ -19,6 +19,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.messages.PoseMessage;
+import org.firstinspires.ftc.teamcode.utility.UnitConversions;
 
 /**
  * Experimental extension of MecanumDrive that uses the Limelight sensor for localization.
@@ -37,16 +38,23 @@ public class LimelightEncoderLocalizerDrive extends MecanumDrive {
     double lastTime = timer.milliseconds()/1000; // divide by 1000 to convert to seconds
     DriveLocalizer localizer;
     Pose2d lastLLPose = pose;
+    final Pose2d startPose;
+    boolean useLL = true;
     Pose2d lastLLVelocity = new Pose2d(0, 0, 0);
     //Pose2d lastLLAcceleration = new Pose2d(0, 0, 0);
     private final DownsampledWriter estimatedPoseWriter = new DownsampledWriter("ESTIMATED_POSE", 50_000_000);
+
+    public void setUseLL(boolean useLL) {
+        this.useLL = useLL;
+    }
+
     public LimelightEncoderLocalizerDrive(HardwareMap hardwareMap, Pose2d pose) {
         super(hardwareMap, pose);
         // Initialize Limelight
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
         limelight.start();
-
+        startPose = pose;
 
         // Initialize IMU
         imu = hardwareMap.get(IMU.class, "imu");
@@ -77,7 +85,7 @@ public class LimelightEncoderLocalizerDrive extends MecanumDrive {
 
         // Update Limelight orientation - Required for MegaTag2
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
-        limelight.updateRobotOrientation(orientation.getYaw(AngleUnit.DEGREES));
+        limelight.updateRobotOrientation(Math.toDegrees(orientation.getYaw(AngleUnit.RADIANS) + headingOffset) - 90);
 
         // Initialize pose, velocity, and acceleration for reading
         Pose2d LLpose;
@@ -86,19 +94,19 @@ public class LimelightEncoderLocalizerDrive extends MecanumDrive {
 
         // Read Limelight data
         LLResult result = limelight.getLatestResult();
-        if (result != null && result.isValid()) {
+        if (useLL && result != null && result.isValid()) {
             // Get Limelight MegaTag2 position data
             Pose3D botPoseMT2 = result.getBotpose_MT2();
 
-            double x_MT2 = botPoseMT2.getPosition().x;
-            double y_MT2 = botPoseMT2.getPosition().y;
+            double x_MT2 = botPoseMT2.getPosition().x * UnitConversions.M_TO_INCH;
+            double y_MT2 = botPoseMT2.getPosition().y * UnitConversions.M_TO_INCH;
 
             // Delta time for velocity calculation
             double deltatime = timer.milliseconds()/1000.0f - lastTime;
             lastTime = timer.milliseconds()/1000.0f; // divide by 1000 to convert to seconds
 
             // Calculate pose, velocity, and acceleration
-            LLpose = new Pose2d(x_MT2, y_MT2, orientation.getYaw(AngleUnit.RADIANS) - headingOffset);
+            LLpose = new Pose2d(x_MT2, y_MT2, orientation.getYaw(AngleUnit.RADIANS) + headingOffset);
             LLvelocity = new Pose2d((LLpose.position.x - lastLLPose.position.x) / deltatime,
                     (LLpose.position.y - lastLLPose.position.y) / deltatime,
                     (LLpose.heading.toDouble() - lastLLPose.heading.toDouble()) / deltatime);

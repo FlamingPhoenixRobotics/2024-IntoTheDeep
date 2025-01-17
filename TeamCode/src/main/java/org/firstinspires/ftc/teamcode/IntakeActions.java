@@ -33,8 +33,24 @@ public class IntakeActions {
             liftR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             liftL.setDirection(DcMotorSimple.Direction.FORWARD);
             liftR.setDirection(DcMotorSimple.Direction.FORWARD); //lol they are reversed electrically. if the wire motoring is correct then change this.
+            liftL.setPower(0.115);
+            liftR.setPower(0.115);//keep it with a bit of power
         }
-
+        public class SetPower implements Action{
+            double power;
+            public SetPower(double power){
+                this.power = power;
+            }
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet){
+                liftL.setPower(power);
+                liftR.setPower(power);
+                return false;
+            }
+        }
+        public Action setPower(double power){
+            return new SetPower(power);
+        }
         public class LiftUp implements Action {
             private boolean initialized = false;
             private final int targetPos;
@@ -45,7 +61,7 @@ public class IntakeActions {
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                if(targetPos < liftL.getCurrentPosition()){
+                if(targetPos < liftR.getCurrentPosition()){
                     liftL.setPower(0.8);
                     liftR.setPower(0.8);
                     return true;
@@ -70,7 +86,7 @@ public class IntakeActions {
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                if(targetpos > liftL.getCurrentPosition()){
+                if(targetpos > liftR.getCurrentPosition()){
                     //150
                     //0
                     liftL.setPower(-0.5);
@@ -78,8 +94,8 @@ public class IntakeActions {
                     return true;
                 }
                 else{
-                    liftL.setPower(0);
-                    liftR.setPower(0);
+                    liftL.setPower(0.1);
+                    liftR.setPower(0.1);
                     return false;
                 }
             }
