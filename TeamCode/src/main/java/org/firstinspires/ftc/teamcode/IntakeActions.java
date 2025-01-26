@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import org.firstinspires.ftc.teamcode.utility.LinkageArm;
 import org.firstinspires.ftc.teamcode.utility.ServoDegreeController;
 import org.firstinspires.ftc.teamcode.utility.UnitConversions;
@@ -238,6 +238,21 @@ public class IntakeActions {
         }
         public Action extendLinkage(double length){
             return new ExtendLinkage(length);
+        }
+        public class ExtendLinkagePos implements Action {
+            double pos;
+            public ExtendLinkagePos(double pos){
+                this.pos = pos;
+            }
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                linkageArm.setPos(pos);
+                return false;
+            }
+        }
+        public Action extendLinkagePos(double pos){
+            return new ExtendLinkagePos(pos);
         }
     }
 }

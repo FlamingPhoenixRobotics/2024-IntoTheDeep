@@ -18,7 +18,7 @@ public class TeleOp extends OpMode {
     Servo linkage;
     double linkPos = 0;
     double liftPos = 0;
-    boolean highReached = true;
+    boolean highReached = true; boolean lowReached = true;
     boolean reset = false;
     int exp = 1;
     @Override
@@ -76,26 +76,33 @@ public class TeleOp extends OpMode {
             }
         }
         if(gamepad1.dpad_left){
-        }
-        if(gamepad1.dpad_right){
+            lowReached = false;
         }
         if(gamepad1.left_bumper){
         }
         if(gamepad1.dpad_right){
-//            highReached = false;
+            highReached = false;
         }
         if(Math.abs(gamepad2.right_stick_y)<0.1){
             liftL.setPower(0.15);
             liftR.setPower(0.15);
-        }//-2850
-        //-2672
+        }
         if(!highReached){
-            if (liftPos>-4700){
+            if (liftPos>-2770){
                 liftR.setPower(1);
-                liftL.setPower(-1);
+                liftL.setPower(1);
             }
             else{
                 highReached = true;
+            }
+        }
+        if(!lowReached){
+            if(liftPos<-2700){
+                liftR.setPower(-1);
+                liftL.setPower(-1);
+            }
+            else{
+                lowReached = true;
             }
         }
         if(linkPos>0.3){

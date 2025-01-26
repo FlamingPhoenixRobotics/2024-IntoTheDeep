@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -29,28 +30,30 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import com.qualcomm.robotcore.hardware.IMU;
-
+import org.firstinspires.ftc.teamcode.IntakeActions;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.utility.ServoDegreeController;
+
 import com.acmerobotics.roadrunner.ParallelAction;
+
+import java.util.Vector;
+
 @Config
 @Autonomous
 public class AutoTest extends AutoBase{
     //private Limelight3A limelight;
-
+    //first -2770
+    //second -2441
     IMU imu;
-
     @Override
     public void runOpMode() {
-        imu = hardwareMap.get(IMU.class, "imu");
-        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
-        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
-        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
-
-        imu.initialize(new IMU.Parameters(orientationOnRobot));
-        imu.resetYaw();
+        IntakeActions.Lift lift = new IntakeActions.Lift(hardwareMap);
+        IntakeActions.Intake intake = new IntakeActions.Intake(hardwareMap);
+        ServoDegreeController sdc=  new ServoDegreeController(hardwareMap.get(Servo.class,"linkage"),255);
+        IntakeActions.Linkage linkage = new IntakeActions.Linkage(sdc);
         /*limelight = hardwareMap.get(Limelight3A.class, "limelight");
 
         telemetry.setMsTransmissionInterval(11);
@@ -58,65 +61,35 @@ public class AutoTest extends AutoBase{
         limelight.pipelineSwitch(0);
 
         limelight.start();*/
+
         Pose2d initialPose = new Pose2d(-12, -62, Math.toRadians(90)); //update with real starting position
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
         //score preload and intake sample from sub  (numbers aren't exact)
         TrajectoryActionBuilder preload = drive.actionBuilder(initialPose)
-                .splineToSplineHeading(new Pose2d(-6,-33, Math.toRadians(90)), Math.toRadians(75))
+                .afterTime(0, lift.liftUp(2100))
+                .strafeTo(new Vector2d(-6, -31.5))
+                .stopAndAdd(lift.liftDown(400))
                 .setReversed(true)
-                .splineTo(new Vector2d(-52,-52),Math.toRadians(180))
-
+                .afterTime(0,intake.intakeOut())
+                .splineToConstantHeading(new Vector2d(-57,-46),Math.toRadians(180))
+                .stopAndAdd(new SequentialAction(linkage.extendLinkagePos(0.23), new SleepAction(1), lift.liftDown(-35), new SleepAction(1), intake.intakeStop()))
+                .setReversed(false)
+                .stopAndAdd(linkage.extendLinkagePos(0.1))
+                .stopAndAdd(new SleepAction(0.5))
+                .afterTime(0, new SequentialAction(lift.liftUp(4500)))
+                .strafeToLinearHeading(new Vector2d(-56,-46),Math.toRadians(190))
+                .stopAndAdd(new SequentialAction(linkage.extendLinkagePos(0.31),new SleepAction(1),intake.intakeIn(), new SleepAction(0.5f), intake.intakeStop()))
                 ;
+
 
         /*limelight.updateRobotOrientation(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
-        LLResult result = limelight.getLatestResult();
-        if (result != null) {
-            if (result.isValid()) {
-                Pose3D botPoseMT1 = result.getBotpose();
-                Pose3D botPoseMT2 = result.getBotpose_MT2();
+        LLResult result = limelight.getLatestResult();*/
 
-                double x_MT1 = botPoseMT1.getPosition().x;
-                double y_MT1 = botPoseMT1.getPosition().y;
-
-                double x_MT2 = botPoseMT2.getPosition().x;
-                double y_MT2 = botPoseMT2.getPosition().y;
-
-                telemetry.addData("MT1 Location:", "(" + x_MT1 + ", " + y_MT1 + ")");
-                telemetry.addData("MT2 Location:", "(" + x_MT2 + ", " + y_MT2 + ")");
-            }
-        }*/
-        telemetry.update();
-        //score sample (numbers aren't exact)
-        TrajectoryActionBuilder tab2 = drive.actionBuilder(initialPose)
-                //this needs to be replaced with the output of previous traj
-                //.splineToSplineHeading(x,y);
-                //llTune();
-                ;
-
-        //intake from basket pos
-        TrajectoryActionBuilder tab3 = drive.actionBuilder(initialPose)//this needs to be replaced with the output of previous traj
-                //.splineTo(x,y)
-                //llTune();
-                //intakeSub();
-                ;
-
-        // actions that need to happen on init; for instance, a claw tightening.
-        //intake();
         waitForStart();
 
-        if (isStopRequested()) return;
-        Actions.runBlocking(new SequentialAction(preload.build())//, lift.raiseSpecimen()
-        );
-        //intakeSub();
-        /*Actions.runBlocking(new ParallelAction(tab2.build())//, lift.raiseLiftSample()
-        );
-        //outtake();
-        Actions.runBlocking(new ParallelAction(tab3.build())//, lift.setIntake()
-        );
-        //intakeSub();
-        Actions.runBlocking(new ParallelAction(tab2.build())//, lift.raiseLiftSample()
-        );*/
 
+        if (isStopRequested()) return;
+        Actions.runBlocking(new ParallelAction(preload.build()));
     }
 }

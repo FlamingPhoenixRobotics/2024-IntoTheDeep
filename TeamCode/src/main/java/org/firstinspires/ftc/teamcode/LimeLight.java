@@ -61,11 +61,11 @@ while(opModeIsActive()) {
             Pose3D botPoseMT1 = result.getBotpose();
             Pose3D botPoseMT2 = result.getBotpose_MT2();
 
-            double x_MT1 = botPoseMT1.getPosition().x;
-            double y_MT1 = botPoseMT1.getPosition().y;
+            double x_MT1 = 39.3701*botPoseMT1.getPosition().x;
+            double y_MT1 = 39.3701*botPoseMT1.getPosition().y;
 
-            double x_MT2 = botPoseMT2.getPosition().x;
-            double y_MT2 = botPoseMT2.getPosition().y;
+            double x_MT2 = 39.3701*botPoseMT2.getPosition().x;
+            double y_MT2 = 39.3701*botPoseMT2.getPosition().y;
 
             telemetry.addData("MT1 Location:", "(" + x_MT1 + ", " + y_MT1 + ")");
             telemetry.addData("MT2 Location:", "(" + x_MT2 + ", " + y_MT2 + ")");

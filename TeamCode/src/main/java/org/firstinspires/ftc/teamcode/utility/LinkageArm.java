@@ -58,4 +58,8 @@ public class LinkageArm {
     public double calcAngle(double len){
         return Math.acos(bar1len*bar1len+len*len-(bar2len-offset)*(bar2len-offset))/(2*bar1len*len);
     }
+    public void setPos(double pos){
+        motor.setPosition(pos);
+    }
+
 }
