@@ -16,6 +16,7 @@ public class FieldCentricDrive {
     IMU imu;
     boolean useIMU = true;
     double heading;
+    double multiplier = 0.8;
     /**
      * Initialize motors
      * @param hardwareMap hardwareMap from opmode
@@ -78,10 +79,10 @@ public class FieldCentricDrive {
         double frp = -(rotY - rotX - rx) / denominator;
         double brp = -(rotY + rotX - rx) / denominator;
 
-        fl.setPower(0.74*flp);
-        bl.setPower(0.74*blp);
-        fr.setPower(0.74*frp);
-        br.setPower(0.74*brp);
+        fl.setPower(multiplier*flp);
+        bl.setPower(multiplier*blp);
+        fr.setPower(multiplier*frp);
+        br.setPower(multiplier*brp);
     }
     /**
      * Drive based off of gamepad
@@ -94,7 +95,7 @@ public class FieldCentricDrive {
         double rx = -0.65*gamepad1.right_stick_x;
         double botHeading;
         if(useIMU) {
-            botHeading= -imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);//might be degrees
+            botHeading = -imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);//might be degrees
         }
         else{
             botHeading = heading;
@@ -119,10 +120,10 @@ public class FieldCentricDrive {
         brp = brp * (1 + 2*gamepad1.left_trigger);
 
 
-        fl.setPower(Math.pow((0.8*flp),exponent));
-        bl.setPower(Math.pow((0.8*blp),exponent));
-        fr.setPower(Math.pow((0.8*frp), exponent));
-        br.setPower(Math.pow((0.8*brp),exponent));;
+        fl.setPower(Math.pow((multiplier*flp),exponent));
+        bl.setPower(Math.pow((multiplier*blp),exponent));
+        fr.setPower(Math.pow((multiplier*frp), exponent));
+        br.setPower(Math.pow((multiplier*brp),exponent));;
     }
     /**
      * Get robot heading in radians
@@ -163,5 +164,8 @@ public class FieldCentricDrive {
      */
     public void setHeading(double heading){
         this.heading = heading;
+    }
+    public void setMultiplier(double mult){
+        this.multiplier = mult;
     }
 }
