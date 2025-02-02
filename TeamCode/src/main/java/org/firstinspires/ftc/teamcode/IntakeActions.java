@@ -62,8 +62,8 @@ public class IntakeActions {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if(targetPos < liftR.getCurrentPosition()){
-                    liftL.setPower(0.8);
-                    liftR.setPower(0.8);
+                    liftL.setPower(1);
+                    liftR.setPower(1);
                     return true;
                 }
                 else{
@@ -89,8 +89,8 @@ public class IntakeActions {
                 if(targetpos > liftR.getCurrentPosition()){
                     //150
                     //0
-                    liftL.setPower(-0.5);
-                    liftR.setPower(-0.5);
+                    liftL.setPower(-0.7);
+                    liftR.setPower(-0.7);
                     return true;
                 }
                 else{
