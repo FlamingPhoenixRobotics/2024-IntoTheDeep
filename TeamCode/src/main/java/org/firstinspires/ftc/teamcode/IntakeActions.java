@@ -31,8 +31,8 @@ public class IntakeActions {
             liftR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             liftL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             liftR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            liftL.setDirection(DcMotorSimple.Direction.FORWARD);
-            liftR.setDirection(DcMotorSimple.Direction.FORWARD); //lol they are reversed electrically. if the wire motoring is correct then change this.
+            liftL.setDirection(DcMotorSimple.Direction.REVERSE);
+            liftR.setDirection(DcMotorSimple.Direction.REVERSE); //lol they are reversed electrically. if the wire motoring is correct then change this.
             liftL.setPower(0.115);
             liftR.setPower(0.115);//keep it with a bit of power
         }

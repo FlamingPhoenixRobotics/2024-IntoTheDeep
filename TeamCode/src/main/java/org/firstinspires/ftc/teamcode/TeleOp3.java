@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.utility.FieldCentricDrive;
@@ -21,6 +22,7 @@ public class TeleOp3 extends OpMode{
     int exp = 1;
     boolean runLift = false;
     boolean liftGoUp;
+    boolean linkStat = false;
     double linkagePos = 0;
     @Override
     public void init() {
@@ -34,6 +36,8 @@ public class TeleOp3 extends OpMode{
         hangr = hardwareMap.dcMotor.get("hang2");
         liftr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        liftl.setDirection(DcMotorSimple.Direction.REVERSE);
+        liftr.setDirection(DcMotorSimple.Direction.REVERSE);
     }
     @Override
     public void loop() {
@@ -46,19 +50,7 @@ public class TeleOp3 extends OpMode{
             targetLiftPos = 2100;//specimen/low basket
             runLift = true;
         }
-        if(gamepad1.a){
-            targetLiftPos = 0;
-            runLift = true;
-        }
-        if(gamepad1.b){
-            targetLiftPos = 520;
-            runLift = true;
-        }
-        if(gamepad1.right_stick_button && abs(gamepad1.right_stick_y)>0.1){
-            linkagePos-=gamepad1.right_stick_y*0.01;
-            linkagePos = Math.min(Math.max(0, linkagePos), 0.6);
-        }
-        linkage.setPosition(linkagePos);
+
         if(abs(gamepad2.right_stick_y) > 0.1){
             liftl.setPower(-gamepad2.right_stick_y);
             liftr.setPower(-gamepad2.right_stick_y);
@@ -69,10 +61,10 @@ public class TeleOp3 extends OpMode{
                 liftr.setPower(0.115);
             }
         }
-        if(gamepad1.left_bumper){
+        if(gamepad1.right_bumper){
             intakeL.setPower(1);
             intakeR.setPower(-1);
-        }else if(gamepad1.right_bumper){
+        }else if(gamepad1.left_bumper){
             intakeL.setPower(-1);
             intakeR.setPower(1);
         }
@@ -80,15 +72,26 @@ public class TeleOp3 extends OpMode{
             intakeL.setPower(0);
             intakeR.setPower(0);
         }
-
-
-
+        if(gamepad1.a){
+            linkagePos = 0.6*gamepad1.left_trigger;
+            linkStat = true;
+        }
+        if(gamepad1.b){
+            linkStat = false;
+        }
+        if(linkStat){
+            double range = 0.6-linkagePos;
+            linkage.setPosition(gamepad1.left_trigger*range+linkagePos);
+        }
+        else{
+            linkage.setPosition(0.6*gamepad1.left_trigger);
+        }
         if(runLift){
             // compare positions and determine direction, then run in that direction until reached target
             if(-liftr.getCurrentPosition() < targetLiftPos) {
                 if(Math.abs(liftr.getCurrentPosition() - targetLiftPos) > 100) {
-                    liftl.setPower(0.8);
-                    liftr.setPower(0.8);}
+                    liftl.setPower(1);
+                    liftr.setPower(1);}
                 else{
                     liftr.setPower(0.4);
                     liftl.setPower(0.4);
