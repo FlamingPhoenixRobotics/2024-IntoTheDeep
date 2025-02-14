@@ -42,13 +42,17 @@ public class TeleOp3 extends OpMode{
     @Override
     public void loop() {
         //gamepad2 LIFT AND INTAKE CONTROLS
-        if(gamepad1.y){
+        if(gamepad1.dpad_up){
             targetLiftPos = 4500; //high basket
             runLift = true;
         }
         if(gamepad1.x){
             targetLiftPos = 2100;//specimen/low basket
             runLift = true;
+        }
+        if(gamepad1.dpad_down){
+            targetLiftPos = 50;
+            runLift =true;
         }
 
         if(abs(gamepad2.right_stick_y) > 0.1){
@@ -60,6 +64,11 @@ public class TeleOp3 extends OpMode{
                 liftl.setPower(0.115);
                 liftr.setPower(0.115);
             }
+        }
+        if(abs(gamepad1.right_stick_y)>0.1 && gamepad1.left_trigger>0.2){
+            liftl.setPower(0.5*-gamepad1.right_stick_y);
+            liftr.setPower(0.5*-gamepad1.right_stick_y);
+            runLift = false;
         }
         if(gamepad1.right_bumper){
             intakeL.setPower(1);
@@ -88,7 +97,7 @@ public class TeleOp3 extends OpMode{
         }
         if(runLift){
             // compare positions and determine direction, then run in that direction until reached target
-            if(-liftr.getCurrentPosition() < targetLiftPos) {
+            if(liftr.getCurrentPosition() < targetLiftPos) {
                 if(Math.abs(liftr.getCurrentPosition() - targetLiftPos) > 100) {
                     liftl.setPower(1);
                     liftr.setPower(1);}
@@ -97,7 +106,7 @@ public class TeleOp3 extends OpMode{
                     liftl.setPower(0.4);
                 }
                 liftGoUp = true;
-            }else if(-liftr.getCurrentPosition() > targetLiftPos) {
+            }else if(liftr.getCurrentPosition() > targetLiftPos) {
                 if(Math.abs(liftr.getCurrentPosition() - targetLiftPos) > 100) {
                     liftl.setPower(-0.5);
                     liftr.setPower(-0.5);
@@ -108,13 +117,13 @@ public class TeleOp3 extends OpMode{
                 liftGoUp = false;
             }
             if(liftGoUp){
-                if(-liftr.getCurrentPosition() >= targetLiftPos){
+                if(liftr.getCurrentPosition() >= targetLiftPos){
                     liftl.setPower(0.115);
                     liftr.setPower(0.115);
                     runLift = false;
                 }
             }else{
-                if(-liftr.getCurrentPosition() <= targetLiftPos){
+                if(liftr.getCurrentPosition() <= targetLiftPos){
                     liftl.setPower(0.115);
                     liftr.setPower(0.115);
                     runLift = false;

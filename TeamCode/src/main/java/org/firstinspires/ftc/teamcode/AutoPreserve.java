@@ -76,22 +76,15 @@ public class AutoPreserve extends AutoBase{
 
         //score preload and intake sample from sub  (numbers aren't exact)
         TrajectoryActionBuilder preload = drive.actionBuilder(initialPose)
-                .strafeTo(new Vector2d(-6, -30))
+                .strafeTo(new Vector2d(-6, -30.5))
                 ;
-        TrajectoryActionBuilder firstIntake = drive.actionBuilder(new Pose2d(-6,-30, Math.toRadians(90)))
+        TrajectoryActionBuilder firstIntake = drive.actionBuilder(new Pose2d(-6,-30.5, Math.toRadians(90)))
                 .setReversed(true)
-                .splineToLinearHeading(new Pose2d(-49,-47, Math.toRadians(90)),Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-49,-46, Math.toRadians(90)),Math.toRadians(180))
                 .afterTime(0,intake.intakeOut())
-                /*.stopAndAdd(new SequentialAction(linkage.extendLinkagePos(0.31), new SleepAction(1), lift.liftDown(-45), new SleepAction(1), intake.intakeStop()))
-                .setReversed(false)
-                .stopAndAdd(linkage.extendLinkagePos(0.1))
-                .stopAndAdd(new SleepAction(0.5))
-                .afterTime(0, new SequentialAction(lift.liftUp(4500)))
-                .strafeToLinearHeading(new Vector2d(-56,-46),Math.toRadians(230))
-                .stopAndAdd(new SequentialAction(new SleepAction(2), linkage.extendLinkagePos(0.21),new SleepAction(1),intake.intakeIn(), new SleepAction(0.5f), intake.intakeStop()))*/
                 ;
-        TrajectoryActionBuilder firstScore = drive.actionBuilder(new Pose2d(-49,-47, Math.toRadians(90)))
-                .stopAndAdd(new SequentialAction(linkage.extendLinkagePos(0.31), new SleepAction(1), lift.liftDown(-45), new SleepAction(1), intake.intakeStop()))
+        TrajectoryActionBuilder firstScore = drive.actionBuilder(new Pose2d(-49,-46, Math.toRadians(90)))
+                .stopAndAdd(new SequentialAction(linkage.extendLinkagePos(0.33), new SleepAction(1), lift.liftDown(-45), new SleepAction(1), intake.intakeStop()))
                 .stopAndAdd(linkage.extendLinkagePos(0.1))
                 .stopAndAdd(new SleepAction(0.5))
                 .afterTime(0, new SequentialAction(lift.liftUp(4500)))
@@ -122,7 +115,7 @@ public class AutoPreserve extends AutoBase{
         Actions.runBlocking(new SequentialAction(firstIntake.build()));
         limelight.updateRobotOrientation(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
         LLResult result = limelight.getLatestResult();
-        drive.pose = new Pose2d(llCheckX(result, -49), llCheckY(result, -47), Math.toRadians(90));
+        //drive.pose = new Pose2d(llCheckX(result, -49), llCheckY(result, -47), Math.toRadians(90));
         Actions.runBlocking(new SequentialAction(firstScore.build()));
         Actions.runBlocking(new SequentialAction(secondIntake.build()));
 

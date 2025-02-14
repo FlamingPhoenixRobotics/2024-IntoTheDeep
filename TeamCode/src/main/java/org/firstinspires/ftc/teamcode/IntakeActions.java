@@ -56,14 +56,15 @@ public class IntakeActions {
             private final int targetPos;
             private boolean up = true;
             public LiftUp(int targetPos){
-                this.targetPos = -targetPos;
+                this.targetPos = targetPos;
             }
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                if(targetPos < liftR.getCurrentPosition()){
+                if(targetPos > liftR.getCurrentPosition()){
                     liftL.setPower(1);
                     liftR.setPower(1);
+
                     return true;
                 }
                 else{
@@ -81,16 +82,16 @@ public class IntakeActions {
             private boolean initialized = false;
             private int targetpos;
             public LiftDown(int targetpos){
-                this.targetpos = -targetpos;
+                this.targetpos = targetpos;
             }
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                if(targetpos > liftR.getCurrentPosition()){
+                if(targetpos < liftR.getCurrentPosition()){
                     //150
                     //0
-                    liftL.setPower(-0.7);
-                    liftR.setPower(-0.7);
+                    liftL.setPower(-0.9);
+                    liftR.setPower(-0.9);
                     return true;
                 }
                 else{
